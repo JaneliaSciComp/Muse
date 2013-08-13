@@ -44,7 +44,7 @@ collect_pdfs_for_10072012_B.m: Function to collect all the
   single-page PDFs for the 10-07-2012-B data data into a single PDF, named
   10072012_B.pdf.
 
-Muse depends upon the Taylor Matlab Toolbox, release 1.13.
+This version of Muse depends upon the Taylor Matlab Toolbox, release 1.14.
 
 All code in Muse is copyright Adam L. Taylor, 2013.  It is licensed under the BSD 2-clause license.  (See below.)
 

@@ -32,7 +32,7 @@ r_tail=meters_per_pel*r_tail_pels;  % m
 % read the cage bounds
 corner_file_name= ...
   fullfile(exp_dir_name, ...
-           sprintf('Test_%s_1_mark_corners',letter_str));
+           sprintf('Test_%s_1_mark_corners.mat',letter_str));
 r_corners=load_corner_file(corner_file_name);  % m
 
 % load the microphone positions
