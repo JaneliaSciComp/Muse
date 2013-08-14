@@ -4,3 +4,4 @@
 .DS_Store
 modpath.m
 toolbox/tmt_rel_*
+*.mat

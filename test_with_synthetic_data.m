@@ -77,7 +77,7 @@ r_true=[0 0]'
 % delay the signals appropriately
 rsubR=bsxfun(@minus,[r_true;0],R);  % 3 x n_mike, pos rel to each mike
 d=reshape(sqrt(sum(rsubR.^2,1)),[n_mikes 1]);  % m, n_mike x 1
-vel=fn_velocity_sound(Temp);  % m/s
+vel=velocity_sound(Temp);  % m/s
 global delay_true;
 delay_true=(1/vel)*d  % true time delays, s, n_mike x 1
 phi=phi_base(n_t);

@@ -69,7 +69,7 @@ N_filt=sum(keep);  % this is the effective N for statistical purposes
 % A_signal=sqrt(P_signal);  % estimate of signal amplitude in freq domain, 1 x K
 
 % get the speed of sound, given the temperature
-vel=fn_velocity_sound(Temp);  % m/s
+vel=velocity_sound(Temp);  % m/s
 
 % compute the tau vector (delay per mike) and the delta_tau vector
 % (relative delay per pair) for each point in the grid
