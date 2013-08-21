@@ -1,4 +1,4 @@
-function rsrp= ...
+function [rsrp,rsrp_per_pair]= ...
   rsrp_from_xcorr_raw_and_delta_tau(xcorr_raw_all,tau_line,tau_diff)
 
 % Calculates sum of the upper cross terms in the formula for steered 
@@ -38,17 +38,17 @@ function rsrp= ...
 [n_pairs,n_r]=size(tau_diff);
 tau0=tau_line(1);
 dtau=(tau_line(end)-tau0)/(length(tau_line)-1);
-xcorr_raw_at_shift=zeros(n_r,n_pairs);
+rsrp_per_pair=zeros(n_r,n_pairs);
 for i=1:n_r
   for j=1:n_pairs
     k_real=(tau_diff(j,i)-tau0)/dtau+1;
     k_lo=floor(k_real);  
     k_hi=k_lo+1;
     w_hi=k_real-k_lo;
-    xcorr_raw_at_shift(i,j)= ...
+    rsrp_per_pair(i,j)= ...
       (1-w_hi)*xcorr_raw_all(k_lo,j)+w_hi*xcorr_raw_all(k_hi,j);
   end
 end
-rsrp=sum(xcorr_raw_at_shift,2);
+rsrp=sum(rsrp_per_pair,2);  % sum across pairs
 
 end

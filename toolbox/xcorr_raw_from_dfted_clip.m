@@ -1,4 +1,4 @@
-function [xcorr_raw,tau_line]=xcorr_raw_from_dfted_clip(V,dt,a,M,verbosity)
+function [xcorr_raw,tau_line]=xcorr_raw_from_dfted_clip(V,dt,M,verbosity)
 
 % a is the gain for each channel, and these are multiplied in.
 
@@ -23,8 +23,10 @@ for i_pair=1:n_pairs
   j_mike=i_mike_pair_this(2);
 
   % calc cross-power spectrum
+%   Xcorr_raw_this= ...
+%     a(i_mike)*a(j_mike)*(V(:,i_mike).*conj(V(:,j_mike)));
   Xcorr_raw_this= ...
-    a(i_mike)*a(j_mike)*(V(:,i_mike).*conj(V(:,j_mike)));
+    V(:,i_mike).*conj(V(:,j_mike));
 
   % pad it, to increase resolution in time domain
   Xcorr_raw_this_padded=pad_at_high_freqs(Xcorr_raw_this,N_line);

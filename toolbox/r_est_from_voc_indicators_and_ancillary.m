@@ -38,8 +38,8 @@ if read_from_map_cache && exist(memo_file_name,'file')
   s=load(memo_file_name);  % gets sse_grid, a few other things
   %fs=s.fs;
   r_est=s.r_est;
-  sse_min=s.sse_min;
-  sse_grid=s.sse_grid;
+  rsrp_max=s.rsrp_max;
+  rsrp_grid=s.rsrp_grid;
   %N=s.N;
   %K=s.K;
   % need to recreate a few things
@@ -61,14 +61,14 @@ if read_from_map_cache && exist(memo_file_name,'file')
   N_filt=sum(keep);
   V_filt=V;
   V_filt(~keep,:)=0;
-  mse_grid=sse_grid/(N^2*K);
-  mse_min=sse_min/(N^2*K);
+  %rsrp_grid=sse_grid/(N^2*K);
+  %rsrp_max=sse_min/(N^2*K);
     % convert to time domain SS by dividing by N, then to mean by
     % dividing by N*K
   V_filt_ss_per_mike=sum(abs(V_filt).^2,1);  % 1 x K, sum of squares
   a=sqrt(V_filt_ss_per_mike)/N;  % volts, gain estimate, proportional to RMS
                                  % amp (in time domain)
-  clear sse_grid sse_min
+  %clear sse_grid sse_min
 else
   % load the audio data for one vocalization
   exp_dir_name=sprintf('%s/sys_test_%s',base_dir_name,date_str);
@@ -83,25 +83,22 @@ else
     % v in V, t in s, fs in Hz                 
 
   % estimate the position, and get the SSE grid also
-  [r_est,mse_min,mse_grid,a,~,N_filt,V_filt,V]= ...
-    r_est_from_clip(v,fs, ...
-                    f_lo,f_hi, ...
-                    Temp, ...
-                    x_grid,y_grid,in_cage, ...
-                    R, ...
-                    verbosity);
+  [r_est,rsrp_max,rsrp_grid,a,~,N_filt,V_filt,V,rsrp_per_pair_grid]= ...
+    r_est_from_clip_simplified(v,fs, ...
+                               f_lo,f_hi, ...
+                               Temp, ...
+                               x_grid,y_grid,in_cage, ...
+                               R, ...
+                               verbosity);
                   
   % save the memo file
   if write_to_map_cache && ~exist(memo_dir_name,'dir')
     mkdir(memo_dir_name);
   end
   [N,K]=size(v);
-  sse_min=(N^2*K)*mse_min;  %#ok damn you, backwards compatibility
-  sse_grid=(N^2*K)*mse_grid;  %#ok damn you, backwards compatibility
   if write_to_map_cache
-    save(memo_file_name,'fs','r_est','sse_min','sse_grid','N','K');
+    save(memo_file_name,'fs','r_est','rsrp_max','rsrp_grid','N','K');
   end
-  clear sse_min sse_grid
 end
 
 % Calculate the total sum of squares for this voc, on the
@@ -110,49 +107,49 @@ ms_total=sum(sum(abs(V_filt).^2))/(N^2*K);
   % convert to time-domain SS by dividing by N, then to mean by
   % dividing by N*K
 
-% Determine MSE at the head, which we call mse_body for historical reasons
+% Determine RSRP at the head, which we call rsrp_body for historical reasons
 d_thresh=0.01;  % cm
 r_body=zeros(2,n_mice);
-mse_body=zeros(1,n_mice);
+rsrp_body=zeros(1,n_mice);
 for i_mouse=1:n_mice
   d=distance_from_point(x_grid,y_grid,r_head(:,i_mouse));
   is_close_to_head=(d<=d_thresh);
   % On some vocs, the stupid mouse head is actually outside the microphone
   % rectangle.  If the head is far enough out that there are no pels in the
-  % "head circle", just return nans mse_body and r_body.  We'll have to sift
+  % "head circle", just return nans rsrp_body and r_body.  We'll have to sift
   % those out later.
   some_pels_close_to_head=any(any(is_close_to_head));
   if some_pels_close_to_head
-    mse_close_to_head=mse_grid(is_close_to_head);
-    [~,k_star]=min(mse_close_to_head);
-    mse_body(i_mouse)=mse_close_to_head(k_star);
+    rsrp_close_to_head=rsrp_grid(is_close_to_head);
+    [~,k_star]=min(rsrp_close_to_head);
+    rsrp_body(i_mouse)=rsrp_close_to_head(k_star);
     x_close_to_head=x_grid(is_close_to_head);
     y_close_to_head=y_grid(is_close_to_head);
     r_body(:,i_mouse)=[x_close_to_head(k_star);y_close_to_head(k_star)];
   else
-    mse_body(i_mouse)=nan;
+    rsrp_body(i_mouse)=nan;
     r_body(:,i_mouse)=[nan;nan];
   end
 end
   
-% load the empirical cdf curve
-conf_level=0.68;
-if quantify_confidence && exist('cdf_dJ_emp_unique.mat','file')
-  s=load('cdf_dJ_emp_unique.mat');
-  cdf_dJ_emp_unique=s.cdf_dJ_emp_unique;
-  dJ_line_unique=s.dJ_line_unique;
-  % determine the critical J, given the desired confidence level
-  dJ_crit=interp1(cdf_dJ_emp_unique,dJ_line_unique,conf_level);
-  % calculate the P-value at each nose position
-  dJ_body=mse_body./mse_min-1;
-  P_body=1-interp1(dJ_line_unique,cdf_dJ_emp_unique,dJ_body);
-else
-  dJ_crit=nan;
-  P_body=nan(1,n_mice);
-end
+% % load the empirical cdf curve
+% conf_level=0.68;
+% if quantify_confidence && exist('cdf_dJ_emp_unique.mat','file')
+%   s=load('cdf_dJ_emp_unique.mat');
+%   cdf_dJ_emp_unique=s.cdf_dJ_emp_unique;
+%   dJ_line_unique=s.dJ_line_unique;
+%   % determine the critical J, given the desired confidence level
+%   dJ_crit=interp1(cdf_dJ_emp_unique,dJ_line_unique,conf_level);
+%   % calculate the P-value at each nose position
+%   dJ_body=rsrp_body./rsrp_max-1;
+%   P_body=1-interp1(dJ_line_unique,cdf_dJ_emp_unique,dJ_body);
+% else
+%   dJ_crit=nan;
+%   P_body=nan(1,n_mice);
+% end
 
-% translate the J_crit to an mse_crit
-mse_crit=mse_min*(dJ_crit+1);  % dJ==mse/mse_min-1, for now
+% % translate the J_crit to an mse_crit
+% mse_crit=rsrp_max*(dJ_crit+1);  % dJ==mse/mse_min-1, for now
 
 % % Determine MSE at the body, approximating the body as an ellipse
 r_center=(r_head+r_tail)/2;
@@ -174,12 +171,13 @@ if verbosity>=1
             0 0 1 ; ...
             0 1 1 ];
   clr_anno=[0 0 0];        
-  rmse_grid=sqrt(mse_grid);
-  figure_objective_map(x_grid,y_grid,1e3*rmse_grid, ...
-                       @jet, ...
-                       [], ...
+  %rmse_grid=sqrt(rsrp_grid);
+  rsrp_abs_max=max(max(abs(rsrp_grid)));
+  figure_objective_map(x_grid,y_grid,1e6*rsrp_grid, ...
+                       @bipolar_red_white_blue, ...
+                       1e6*rsrp_abs_max*[-1 +1], ...
                        title_str, ...
-                       'RMSE (mV)', ...
+                       'RSRP (mV^2)', ...
                        clr_mike, ...
                        clr_anno, ...
                        r_est,[], ...
@@ -200,10 +198,10 @@ end
 % pack the return vars
 blob=struct();
 blob.r_est=r_est;
-blob.mse_min=mse_min;
-blob.mse_crit=mse_crit;
-blob.mse_body=mse_body;
-blob.P_body=P_body;
+blob.rsrp_max=rsrp_max;
+%blob.mse_crit=mse_crit;
+blob.rsrp_body=rsrp_body;
+%blob.P_body=P_body;
 blob.r_body=r_body;
 blob.ms_total=ms_total;
 blob.a=a;
@@ -216,7 +214,8 @@ blob.syl_name=syl_name;
 blob.r_head=r_head;
 blob.r_tail=r_tail;
 if return_big_things
-  blob.mse_grid=mse_grid;
+  blob.rsrp_grid=rsrp_grid;
+  blob.rsrp_per_pair_grid=rsrp_per_pair_grid;
   blob.V_filt=V_filt;
   blob.V=V;
   blob.v=v;

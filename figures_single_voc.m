@@ -1,16 +1,16 @@
 % identifying info for the voc
 
-% % good one
-% date_str='06132012';
-% letter_str='D';
-% syl_name='Voc84';
+% good one
+date_str='06132012';
+letter_str='D';
+syl_name='Voc84';
 
 % % seemingly hard one, but get good estimate
 % date_str='06132012';
 % letter_str='D';
 % syl_name='Voc110';
 
-% % bad one
+% % bad one -- seems like mikes 3 & 4 are just giving no information
 % date_str='06052012';
 % letter_str='D';
 % syl_name='Voc572';
@@ -20,7 +20,8 @@
 % letter_str='E';
 % syl_name='Voc266';
 
-% % test voc
+% % test voc -- get good localization on three pairs, presumably b/c
+% % all signals are similar in amplitude
 % date_str='06132012';
 % letter_str='D';
 % syl_name='Voc133';
@@ -30,10 +31,10 @@
 % letter_str='D';
 % syl_name='Voc685;
 
-% problematic
-date_str='06052012';
-letter_str='D';
-syl_name='Voc686';
+% % problematic, but well-localized
+% date_str='06052012';
+% letter_str='D';
+% syl_name='Voc686';
 
 % % problematic one, turns out f_lo>f_hi
 % date_str='06052012';
@@ -64,7 +65,7 @@ args.read_from_map_cache=true;
 args.write_to_map_cache=false;
 args.quantify_confidence=true;
 args.return_big_things=true;
-verbosity=0;
+verbosity=1;
 
 tic
 r_est_blob = ...
@@ -83,16 +84,19 @@ for i=1:length(field_name)
   eval(sprintf('%s=r_est_blob.%s;',field_name{i},field_name{i}));
 end
 
-% RMSEs are easier to interpret
-rmse_grid=sqrt(mse_grid);
-rmse_min=sqrt(mse_min);
-rmse_crit=sqrt(mse_crit);
-rmse_body=sqrt(mse_body);
-rms_total=sqrt(ms_total);
+% show the per-mic RMS amplitudes
+r_in_mV=1000*a  %#ok
 
-%dsiplay some of those
-rmse_min_disp=1e3*rmse_min
-rms_total_disp=1e3*rms_total
+% % RMSEs are easier to interpret
+% rmse_grid=sqrt(mse_grid);
+% rmse_min=sqrt(mse_min);
+% rmse_crit=sqrt(mse_crit);
+% rmse_body=sqrt(mse_body);
+% rms_total=sqrt(ms_total);
+
+% % display some of those
+% rmse_min_disp=1e3*rmse_min
+% rms_total_disp=1e3*rms_total
 
 % extrapolate a mouse ellipse
 r_center=(r_head+r_tail)/2;
@@ -100,11 +104,12 @@ a_vec=r_head-r_center;  % vector
 b=norm(a_vec)/3;  % scalar, and a guess at the half-width of the mouse
 
 % Compute the CR borders from the objective function and critical value
-in_cr_grid=(mse_grid<=mse_crit);
+%in_cr_grid=(mse_grid<=mse_crit);
 %r_cr_bounds_ij=bwboundaries(in_cr_grid);
 %r_cr_bounds=path_xy_from_path_ij(r_cr_bounds_ij,x_grid,y_grid);
 
 % make a figure of the objective funtion, estimate, and CR
+rsrp_abs_max=max(max(abs(rsrp_grid)));  %#ok
 title_str=sprintf('%s %s %s', ...
                   date_str,letter_str,syl_name);
 clr_anno=[0 0 0];
@@ -112,11 +117,11 @@ clr_mike=[1 0 0 ; ...
           0 0.7 0 ; ...
           0 0 1 ; ...
           0 0.8 0.8 ];
-figure_objective_map(x_grid,y_grid,10^3*rmse_grid, ...
-                     @jet, ...
-                     [], ...
+figure_objective_map(x_grid,y_grid,10^6*rsrp_grid, ...
+                     @bipolar_red_white_blue, ...
+                     10^6*rsrp_abs_max*[-1 +1], ...
                      title_str, ...
-                     'RMSE (mV)', ...
+                     'RSRP (mV^2)', ...
                      clr_mike, ...
                      clr_anno, ...
                      r_est,[], ...
@@ -127,18 +132,39 @@ line(100*r_mouse_ellipse(1,:),100*r_mouse_ellipse(2,:),'color','k');
 %      'marker','o','linestyle','none','color','w', ...
 %      'markersize',6);
 
-% make a histogram of the RMSE
-rmse_serial=rmse_grid(:);
-rmse_edges=1e-3*(floor(1e3*min(rmse_serial)):0.1:ceil(1e3*max(rmse_serial)))';
-rmse_centers=(rmse_edges(1:end-1)+rmse_edges(2:end))/2;
-n_pels_per_rmse_bin=histc(rmse_serial,rmse_edges);
-n_pels_per_rmse_bin(end)=[];
-frac_pels_per_rmse_bin=n_pels_per_rmse_bin/length(rmse_serial);
+% plot the rsrp image for each pair
+n_pairs=size(rsrp_per_pair_grid,3);  %#ok
+K=size(R,2);
+[M,iMicFirst,iMicSecond]=mixing_matrix_from_n_mics(K);
+for i_pair=1:n_pairs
+  title_str=sprintf('%s %s %s, Mic pair %d,%d', ...
+                    date_str,letter_str,syl_name,iMicFirst(i_pair),iMicSecond(i_pair));
+  rsrp_abs_max_this=max(max(abs(rsrp_per_pair_grid(:,:,i_pair))));
+  figure_objective_map(x_grid,y_grid,10^6*rsrp_per_pair_grid(:,:,i_pair), ...
+                       @bipolar_red_white_blue, ...
+                       10^6*rsrp_abs_max_this*[-1 +1], ...
+                       title_str, ...
+                       'RSRP (mV^2)', ...
+                       clr_mike, ...
+                       clr_anno, ...
+                       r_est,[], ...
+                       R,r_head,r_tail);
+  r_mouse_ellipse=polygon_from_ellipse(r_center,a_vec,b);
+  line(100*r_mouse_ellipse(1,:),100*r_mouse_ellipse(2,:),'color','k');
+end  
+
+% make a histogram of the rsrp
+rsrp_serial=rsrp_grid(:);
+rsrp_edges=1e-6*(floor(1e6*min(rsrp_serial)):0.1:ceil(1e6*max(rsrp_serial)))';
+rsrp_centers=(rsrp_edges(1:end-1)+rsrp_edges(2:end))/2;
+n_pels_per_rsrp_bin=histc(rsrp_serial,rsrp_edges);
+n_pels_per_rsrp_bin(end)=[];
+frac_pels_per_rsrp_bin=n_pels_per_rsrp_bin/length(rsrp_serial);
 
 figure('color','w');
-h=bar(1e3*rmse_centers,100*frac_pels_per_rmse_bin);
+h=bar(1e6*rsrp_centers,100*frac_pels_per_rsrp_bin);
 set(h,'edgecolor','none');
-xlabel('RMSE (mV)');
+xlabel('RSRP (mV^2)');
 ylabel('Pels per bin (%)');
 
 
