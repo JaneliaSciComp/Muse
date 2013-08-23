@@ -46,7 +46,9 @@ collect_pdfs_for_10072012_B.m: Function to collect all the
 
 This version of Muse depends upon the Taylor Matlab Toolbox, release 1.14.
 
-All code in Muse is copyright Adam L. Taylor, 2013.  It is licensed under the BSD 2-clause license.  (See below.)
+All code in Muse, except that in toolbox/snippeter, is copyright Adam
+L. Taylor, 2013.  It is licensed under the BSD 2-clause license.  (See
+below.)
 
 Copyright (c) 2013, Adam L. Taylor
 All rights reserved.
