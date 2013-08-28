@@ -189,9 +189,11 @@ for i_data_set = 1:length(data_set_dir_name_list)
         dir_struct = dir(fullfile(demuxed_data_dir_name,'no_merge_only_har',voc_list_file_name_pattern));
         voc_list_dir_name=dir_struct.name;
         %cd (tmp_voc_str.name)
-        s=load(fullfile(demuxed_data_dir_name,'no_merge_only_har',voc_list_dir_name,voc_list_mat_file_name));
+        ax_output_mat_file_name=fullfile(demuxed_data_dir_name,'no_merge_only_har',voc_list_dir_name,voc_list_mat_file_name);
+        s=load(ax_output_mat_file_name);
         voc_list=s.voc_list;
         clear s;
+        mouse_from_ax=load_ax_segments(ax_output_mat_file_name);
 
         %loads full frequency contours file from directory with voc_list
         fc2_file_name=fullfile(demuxed_data_dir_name,'no_merge_only_har',voc_list_dir_name,'fc2.mat');
@@ -201,23 +203,23 @@ for i_data_set = 1:length(data_set_dir_name_list)
             clear s
         end
 
-        tmp_good = voc_list(:,6);
-        good_vocs = tmp_good == 1;
-        list = voc_list(good_vocs,1:5);
-
+%         tmp_good = voc_list(:,6);
+%         good_vocs = tmp_good == 1;
+%         list = voc_list(good_vocs,1:5);
+ 
         tic
-        n_segments_from_ax=size(list,1);
-        mouse_from_ax=struct('syl_name',cell(1,n_segments_from_ax));
-        for i = 1:n_segments_from_ax
-            %voc number
-            mouse_from_ax(i).syl_name = sprintf('Voc%g',list(i,1));
-            %voc freq info
-            mouse_from_ax(i).lf_fine = floor(list(i,4));
-            mouse_from_ax(i).hf_fine = ceil(list(i,5));
-            %voc start/stop times(samples)
-            mouse_from_ax(i).start_sample_fine = list(i,2);
-            mouse_from_ax(i).stop_sample_fine = list(i,3);
-        end
+        n_segments_from_ax=length(mouse_from_ax);
+%         mouse_from_ax=struct('syl_name',cell(1,n_segments_from_ax));
+%         for i = 1:n_segments_from_ax
+%             %voc number
+%             mouse_from_ax(i).syl_name = sprintf('Voc%g',list(i,1));
+%             %voc freq info
+%             mouse_from_ax(i).lf_fine = floor(list(i,4));
+%             mouse_from_ax(i).hf_fine = ceil(list(i,5));
+%             %voc start/stop times(samples)
+%             mouse_from_ax(i).start_sample_fine = list(i,2);
+%             mouse_from_ax(i).stop_sample_fine = list(i,3);
+%         end
         %cd (saving_dir)
         %save(fullfile(saving_dir,sprintf('%s_Mouse',session_base_name)),'mouse_from_ax');  %   We do _not_ want to save this---it's not the final thing
         clear file_name1 dashpos tmp_good voc_list tmp_good good_vocs list data_set_info

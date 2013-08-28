@@ -1,11 +1,36 @@
 exp_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
 letter_str='D';
-i_segment_start=10547488;  % Voc130 from ax, voc51 after snippetization
-i_segment_end=10558880;  % these are both matlab-style indices
 fs=450450;  % Hz, happen to know this a priori
-dt=1/fs;  % s
 start_pad_duration_want=0.010;  % s
 end_pad_duration_want=0.010;  % s
+clr_mike=[1 0 0 ; ...
+          0 0.7 0 ; ...
+          0 0 1 ; ...
+          0 0.8 0.8 ];
+
+% load the raw ax output
+demuxed_data_dir_name = fullfile(exp_dir_name,'demux');
+ax_output_parent_dir_name=fullfile(demuxed_data_dir_name,'no_merge_only_har');
+ax_output_dir_name_pattern = sprintf('*_%s_*',letter_str);
+ax_output_parent_dir_listing_struct = dir(fullfile(ax_output_parent_dir_name,ax_output_dir_name_pattern));
+ax_output_dir_name=ax_output_parent_dir_listing_struct.name;
+ax_output_mat_file_name = sprintf('Test_%s_1_voc_list_no_merge_har.mat',letter_str);
+ax_output_mat_file_name_abs=fullfile(ax_output_parent_dir_name,ax_output_dir_name,ax_output_mat_file_name);
+mouse_from_ax=load_ax_segments(ax_output_mat_file_name_abs);
+
+% extract the voc we want
+example_segment_name='Voc130';
+is_example_segment=strcmp(example_segment_name,{mouse_from_ax.syl_name});
+mouse_from_ax_example_segment=mouse_from_ax(is_example_segment)
+
+% work out the segment start indices, with padding
+i_segment_start=mouse_from_ax_example_segment.start_sample_fine
+i_segment_end=mouse_from_ax_example_segment.stop_sample_fine
+f_lo_segment=mouse_from_ax_example_segment.lf_fine
+f_hi_segment=mouse_from_ax_example_segment.hf_fine
+%i_segment_start=10547488;  % Voc130 from ax, voc51 after snippetization
+%i_segment_end=10558880;  % these are both matlab-style indices
+dt=1/fs;  % s
 samples_in_start_pad=ceil(start_pad_duration_want/dt);
 samples_in_end_pad=ceil(end_pad_duration_want/dt);
 i_start=i_segment_start-samples_in_start_pad; 
@@ -18,11 +43,6 @@ i_end=i_segment_end+samples_in_end_pad;
 
 % returned t starts at zero, want zero to be segment start
 t=t-dt*samples_in_start_pad;
-
-clr_mike=[1 0 0 ; ...
-          0 0.7 0 ; ...
-          0 0 1 ; ...
-          0 0.8 0.8 ];
 
 % set up the figure and place all the axes                                   
 w_fig=2.5; % in
@@ -174,10 +194,19 @@ i_example_segment=51;  %
 is_example_segment= ([snippets.index]==i_example_segment) ;
 example_snippets=snippets(is_example_segment);
 
-% draw rectangles for each snippet on all the spectrograms
+% draw a rect showing the ax segment bound
 i_mic_to_show_snippets_on=4;
-n_example_snippets=length(example_snippets);
 t_segment_start=dt*(i_segment_start-1);
+t_segment_end=dt*(i_segment_end-1);
+t_segment_end_rel=t_segment_end-t_segment_start;
+line('parent',subplot_handles(i_mic_to_show_snippets_on), ...
+     'xdata',1000*[0 t_segment_end_rel t_segment_end_rel 0 0], ...
+     'ydata',[f_lo_segment f_lo_segment f_hi_segment f_hi_segment f_lo_segment], ...
+     'linewidth',0.25, ...
+     'color',[0 0.7 0]);
+
+% draw rectangles for each snippet on all the spectrograms
+n_example_snippets=length(example_snippets);
 for i_example_snippet=1:n_example_snippets
   this_snippet=example_snippets(i_example_snippet);
   t_lo=dt*(this_snippet.start_sample_fine-1);  %s
