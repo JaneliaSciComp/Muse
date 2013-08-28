@@ -1,4 +1,4 @@
-function [positions_out, handle] = fn_mic_pos_location(dir1,imagefile,meters_2_pixels,load_saved_positions)
+function [positions_out, handle] = fn_mic_pos_location(dir_name,image_file_name_local,meters_2_pixels,load_saved_positions)
 % fn_mic_pos_location
 %   This function allows one to create a structure with the the following 
 %       vars x_pix, y_pix, x_m, y_m, and z_m
@@ -26,18 +26,19 @@ function [positions_out, handle] = fn_mic_pos_location(dir1,imagefile,meters_2_p
 %       1 is located in upper left corner
 %
 
-cd (dir1)
+%cd (dir_name)
 if strcmp(load_saved_positions,'n')==1  
 %     image_matrix = imread(imagefile, fmt);
 %     image_matrix_r = imrotate(image_matrix,270);%rotates camera position so that microphone 1 is located in upper left corner
-    imagefile2 = [dir1 imagefile];
-    [positions_out, handle] = fn_position_calib(imagefile2,meters_2_pixels);%this function is a function from Roian Egnor and modified by jpn
-    sfname1 = 'positions_out';
-    sfname2 = 'meters_2_pixels';
+    image_file_name_abs = fullfile(dir_name,image_file_name_local);
+    [positions_out, handle] = fn_position_calib(image_file_name_abs,meters_2_pixels);%this function is a function from Roian Egnor and modified by jpn
+    sfname1 = fullfile(dir_name,'positions_out');
+    sfname2 = fullfile(dir_name,'meters_2_pixels');
     save(sfname1,'positions_out')
     save(sfname2,'meters_2_pixels');
 else
     figure('Visible','off')
     handle = gcf;
-    load positions_out.mat
+    file_name=fullfile(dir_name,'positions_out.mat');
+    load(file_name);
 end

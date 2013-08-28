@@ -1,12 +1,13 @@
-function [ pulse ] = fn_video_time_ts_chuncks2(dir1, audio_fname_prefix, fc, vfc )
+function [ pulse ] = fn_video_time_ts_chuncks2(dir_name, audio_fname_prefix, fc, vfc )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-cd (dir1)
+%cd (dir_name)
 %cd C:\Data\tmp_data
-filename = [audio_fname_prefix '.ch5'];
+filename_local = [audio_fname_prefix '.ch5'];
+filename_abs=fullfile(dir_name,filename_local);
 % precision = 'float32';
 
-m = memmapfile(filename,         ...
+m = memmapfile(filename_abs,         ...
     'Offset', 0,        ...
     'Format', 'single',    ...
     'Writable', false);

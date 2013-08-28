@@ -9,5 +9,6 @@ addpath(genpath(fullfile(this_dir_name,'toolbox','snippeter')));
 %addpath(genpath(fullfile(this_dir_name,'groundswell/groundswell_rel_118')));
 parent_dir_name=fileparts(this_dir_name);
 addpath(degit(genpath(fullfile(parent_dir_name,'ax_repo'))));
+addpath(degit(genpath('~/groundswell/repo')));
 
 end

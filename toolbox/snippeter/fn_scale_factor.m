@@ -1,4 +1,4 @@
-function [ meters_2_pixels, handle ] = fn_scale_factor(dir1, imagefile, scale_size, load_saved_conversion_factor)
+function [ meters_2_pixels, handle ] = fn_scale_factor(dir_name, image_file_name, scale_size, load_saved_conversion_factor)
 %fn_scale_factor
 %   function calculates the converstion factor from known length of a tape
 %   measure that has been recorded as a video using stream pix,
@@ -29,9 +29,9 @@ if strcmp(load_saved_conversion_factor,'n')==1
 %     fmt = 'jpg';
     x_m = scale_size*0.0254; %0.3556; %1 inche = 0.0254 meters
     
-    cd (dir1)
-    imagefile2 = [dir1 imagefile];
-    fn_FigureTrackFrame_jpn(imagefile2,6);
+    %cd (dir_name)
+    image_file_name_abs = fullfile(dir_name,image_file_name);
+    fn_FigureTrackFrame_jpn(image_file_name_abs,6);
     handle = gcf;
     disp('Zoom with mouse, then press any left arrow key')
     zoom
@@ -61,10 +61,12 @@ if strcmp(load_saved_conversion_factor,'n')==1
     
     x_pix_1=fn_position_to_distance([new(1).x, new(1).y],[new(2).x,new(2).y]);
     meters_2_pixels =x_m/x_pix_1;
-    save('meters_2_pixels','meters_2_pixels')    
+    meters_2_pixels_file_name_abs=fullfile(dir_name,'meters_2_pixels');
+    save(meters_2_pixels_file_name_abs,'meters_2_pixels')    
 else
-    cd (dir1) %added on 2/26/2013
-    load meters_2_pixels
+    %cd (dir_name) %added on 2/26/2013
+    meters_2_pixels_file_name_abs=fullfile(dir_name,'meters_2_pixels');
+    load(meters_2_pixels_file_name_abs);
     figure('Visible','off')
     handle = gcf;
 end

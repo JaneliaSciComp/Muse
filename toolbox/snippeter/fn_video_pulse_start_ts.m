@@ -1,4 +1,4 @@
-function [ video_pulse_start_ts dist] = fn_video_pulse_start_ts(dir1, dir2, audio_fname_prefix, video_fname_prefix, load_time_stamps, fc, vfc) 
+function [ video_pulse_start_ts, dist] = fn_video_pulse_start_ts(audio_data_dir_name, video_data_dir_name, audio_fname_prefix, video_fname_prefix, load_time_stamps, fc, vfc) 
 %fn_video_pulse_start_ts
 %   function extracts timestamps associated with recorded pulses from
 %   function generator that drive camera frames
@@ -30,34 +30,39 @@ if strcmp(load_time_stamps,'n')==1
 %     tmp_a2 = tmp;
 %     tmp_i2=tmp_a2>1;
 %     video_pulse_start_ts = find(diff(tmp_i2)==1);
-    video_pulse_start_ts = fn_video_time_ts_chuncks2(dir1, audio_fname_prefix, fc, vfc );
+    video_pulse_start_ts = fn_video_time_ts_chuncks2(audio_data_dir_name, audio_fname_prefix, fc, vfc );
 
-    marker = 2*ones(size(video_pulse_start_ts,1),1);
-    comb_marker_pulses = [video_pulse_start_ts marker];
+    %marker = 2*ones(size(video_pulse_start_ts,1),1);
+    %comb_marker_pulses = [video_pulse_start_ts marker];
     
 %     pul = figure;
 %     plot(tmp,'k')
 %     hold on
 %     plot(comb_marker_pulses(:,1),comb_marker_pulses(:,2),'r.')
 
-    cd (dir2)
-    fname = sprintf('%s.seq',video_fname_prefix);
-    fname_path = [dir2 fname];
-    strctMovInfo = fnReadSeqInfo_jpn(fname_path);
+    %cd (video_data_dir_name)
+    local_video_file_name = sprintf('%s.seq',video_fname_prefix);
+    absolute_video_file_name = fullfile(video_data_dir_name,local_video_file_name);
+    strctMovInfo = fnReadSeqInfo_jpn(absolute_video_file_name);
     clear ts df_ts
     ts = strctMovInfo.m_afTimestamp;
     df_ts = diff(ts);
     dist = figure;
     hist(df_ts,0:0.001:(max(df_ts)+0.01))
 %     xlim([(min(df_ts)-0.1) (max(df_ts)+0.1)])
-    foo = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
-    save(foo,'video_pulse_start_ts')
+    local_video_pulse_file_name = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
+    absolute_video_pulse_file_name = fullfile(video_data_dir_name,local_video_pulse_file_name);    
+    save(absolute_video_pulse_file_name,'video_pulse_start_ts')
 %     saveas(pul,sprintf('%s_video_pulses.jpg',video_fname_prefix));
-    saveas(dist,sprintf('%s_timestamp_distribution.jpg',video_fname_prefix));
+    local_timestamp_distribution_file_name=sprintf('%s_timestamp_distribution.jpg',video_fname_prefix);
+    absolute_timestamp_distribution_file_name = fullfile(video_data_dir_name,local_timestamp_distribution_file_name);        
+    saveas(dist,absolute_timestamp_distribution_file_name);
 else
-    cd (dir2)
-    foo = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
-    load (foo)
+    %cd (video_data_dir_name)
+    %foo = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
+    local_video_pulse_file_name = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
+    absolute_video_pulse_file_name = fullfile(video_data_dir_name,local_video_pulse_file_name);    
+    load (absolute_video_pulse_file_name)
     dist = figure('Visible','off');
 %     pul = figure('Visible','off');
 end

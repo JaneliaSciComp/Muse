@@ -6,9 +6,9 @@ count = 0;
 id = 'MATLAB:sprintf:InputForPercentSIsNotOfClassChar';
 warning('off',id)
 
-for index1 = 1:size(mouse,2)
+for i_segment = 1:size(mouse,2)
 %     disp(index1)
-    this_mouse = mouse(index1);
+    this_mouse = mouse(i_segment);
     syl_str = this_mouse.syl_name;
     syl_val = str2double(syl_str(4:end));
     start_ts = this_mouse.start_sample_fine;
@@ -16,10 +16,10 @@ for index1 = 1:size(mouse,2)
     
     [ frame_number,frame_number_ts ] = fn_extract_frames2( video_pulse_start_ts, start_ts, stop_ts );
     
-    num = num2str(index1);
-    num = fn_numPad(num,6);
+    %num = num2str(i_segment);
+    %num = fn_numPad(num,6);
     
-    syl_name = sprintf('Voc%s_0',num);
+    %syl_name = sprintf('Voc%s_0',num);
     tmp_name = this_mouse.syl_name;
     
     pos1 = strfind(tmp_name,'Voc');    
@@ -40,7 +40,7 @@ for index1 = 1:size(mouse,2)
     t_bins_sec = t_bins_samples/fc;
     %looking at all parts of freq_contour2 file associated with segment
     for i = 1:size(freq_contours2{1,voc_list_orig_loc},2)
-        count2 = 96;
+        count2 = 0;
         count3 = 0;
         edges = cell(1,2);
         b1 = freq_contours2{1,voc_list_orig_loc}{1,i};
@@ -63,15 +63,15 @@ for index1 = 1:size(mouse,2)
             for f_find = 1:size(foi,2)                
                 count = count + 1;
                 count3 = count3 + 1;                
-                count3_s = fn_numPad(count3,3);
-                i_s = fn_numPad(i,2);
-                new_mouse(1,count).syl_name = sprintf('Voc%s_%s%s_%s',num,count2,i_s,count3_s);
+                %count3_s = fn_numPad(count3,3);
+                %i_s = fn_numPad(i,2);
+                new_mouse(1,count).syl_name = sprintf('Voc%06d_%s%02d_%03d',i_segment,char(96+count2),i,count3);
                 new_mouse(1,count).syl_name_old = syl_val;
                 new_mouse(1,count).lf_fine = f_bins(foi(f_find));
                 new_mouse(1,count).hf_fine = f_bins(foi(f_find)+1)-1;
                 new_mouse(1,count).start_sample_fine = cur_start_ts;
                 new_mouse(1,count).stop_sample_fine = cur_stop_ts;
-                new_mouse(1,count).index = index1;
+                new_mouse(1,count).index = i_segment;
                 new_mouse(1,count).hot_pix = N(t_find,foi(f_find));
                 new_mouse(1,count).frame_range = frame_number; %frames associated with entire segment
                 new_mouse(1,count).frame_range_ts = frame_number_ts; %frame time stamps associated with entire segment
