@@ -193,7 +193,7 @@ for i_data_set = 1:length(data_set_dir_name_list)
         s=load(ax_output_mat_file_name);
         voc_list=s.voc_list;
         clear s;
-        mouse_from_ax=load_ax_segments(ax_output_mat_file_name);
+        mouse_from_ax=load_ax_segments_and_append_frame_number(ax_output_mat_file_name,video_pulse_start_ts,associated_video_frame_method);
 
         %loads full frequency contours file from directory with voc_list
         fc2_file_name=fullfile(demuxed_data_dir_name,'no_merge_only_har',voc_list_dir_name,'fc2.mat');
@@ -224,31 +224,31 @@ for i_data_set = 1:length(data_set_dir_name_list)
         %save(fullfile(saving_dir,sprintf('%s_Mouse',session_base_name)),'mouse_from_ax');  %   We do _not_ want to save this---it's not the final thing
         clear file_name1 dashpos tmp_good voc_list tmp_good good_vocs list data_set_info
         
-        for i = 1:n_segments_from_ax %maybe setup parallel processing
-
-            start_point = mouse_from_ax(i).start_sample_fine;
-            end_point = mouse_from_ax(i).stop_sample_fine;
-
-            %determines frames associated with vocalization
-            [ frame_number,frame_number_ts ] = fn_extract_frames2( video_pulse_start_ts, start_point, end_point );
-            %if want closest video frame associated with vocalization start sample
-            %set associated video frame to close
-            if strcmp(associated_video_frame_method,'close')==1
-                [smallest_value,smallest_loc] = min(abs(frame_number_ts-start_point));
-                frame_of_interest = frame_number(smallest_loc);
-                frame_ts_of_interest = frame_number_ts(smallest_loc);
-                %if want begining video frame associated with vocalization start sample
-                %set associated video frame to close
-            elseif  strcmp(associated_video_frame_method,'begin')==1
-                frame_of_interest = frame_number(1);
-            end
-            mouse_from_ax(i).frame_range = frame_number;
-            mouse_from_ax(i).frame_range_ts = frame_number_ts;
-            mouse_from_ax(i).frame_number = frame_of_interest;
-
-            clear start_point end_point frame_range
-            clear smallest_value smallest_loc
-        end
+%         for i = 1:n_segments_from_ax %maybe setup parallel processing
+% 
+%             start_point = mouse_from_ax(i).start_sample_fine;
+%             end_point = mouse_from_ax(i).stop_sample_fine;
+% 
+%             %determines frames associated with vocalization
+%             [ frame_number,frame_number_ts ] = fn_extract_frames2( video_pulse_start_ts, start_point, end_point );
+%             %if want closest video frame associated with vocalization start sample
+%             %set associated video frame to close
+%             if strcmp(associated_video_frame_method,'close')==1
+%                 [smallest_value,smallest_loc] = min(abs(frame_number_ts-start_point));
+%                 frame_of_interest = frame_number(smallest_loc);
+%                 frame_ts_of_interest = frame_number_ts(smallest_loc);
+%                 %if want begining video frame associated with vocalization start sample
+%                 %set associated video frame to close
+%             elseif  strcmp(associated_video_frame_method,'begin')==1
+%                 frame_of_interest = frame_number(1);
+%             end
+%             mouse_from_ax(i).frame_range = frame_number;
+%             mouse_from_ax(i).frame_range_ts = frame_number_ts;
+%             mouse_from_ax(i).frame_number = frame_of_interest;
+% 
+%             clear start_point end_point frame_range
+%             clear smallest_value smallest_loc
+%         end
 
         %removes vocilizations that occured before or after video was
         %started/stopped

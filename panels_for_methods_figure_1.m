@@ -1,5 +1,6 @@
 exp_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
 letter_str='D';
+data_analysis_dir_name='Data_analysis10';
 fs=450450;  % Hz, happen to know this a priori
 start_pad_duration_want=0.010;  % s
 end_pad_duration_want=0.010;  % s
@@ -103,21 +104,30 @@ for i_mic=1:n_mics
        'color','k');
 end
 
-% write to a .tcs file
-name=cell(n_mics,1);
-units=cell(n_mics,1);
-for i_mic=1:n_mics
-  name{i_mic}=sprintf('Mic %d',i_mic);
-  units{i_mic}='mV';
-end
-write_tcs_common_timeline('example_voc.tcs',name,t,1000*v,units);
+% % write to a .tcs file
+% name=cell(n_mics,1);
+% units=cell(n_mics,1);
+% for i_mic=1:n_mics
+%   name{i_mic}=sprintf('Mic %d',i_mic);
+%   units{i_mic}='mV';
+% end
+% write_tcs_common_timeline('example_voc.tcs',name,t,1000*v,units);
+
+
+
+
+
+
+
+
+
 
 % played around in Groundswell, found good Spectrogram params
 T_window_want=0.002;  % s 
 dt_window_want=T_window_want/10;
 NW=2;
 K=3;
-f_max_keep=120e3;  % Hz
+f_max_keep=100e3;  % Hz
 p_FFT_extra=2;
 
 % calc spectrogram
@@ -161,7 +171,7 @@ for i_mic=1:n_mics ,
   subplot_handle=subplot_handles(i_mic);
   axes(subplot_handle);  %#ok
   plot_powgram(1000*t_S,f_S,1e9*S(:,:,i_mic),...
-               [],[],[],...
+               [],[50000 f_max_keep],[],...
                'amplitude',[0 80],...
                title_str);  % convert to mV^2/kHz
   set(subplot_handle,'fontsize',7);
@@ -186,7 +196,7 @@ xlabel(subplot_handle,'Time (ms)','fontsize',7);
 
 % load the snippets determined by Josh's code
 snippet_file_name=fullfile(exp_dir_name, ...
-                           'Data_analysis10', ...
+                           data_analysis_dir_name, ...
                            sprintf('Test_%s_1_Mouse.mat',letter_str));
 snippet_file_contents=load(snippet_file_name);
 snippets=snippet_file_contents.mouse;
@@ -205,8 +215,13 @@ line('parent',subplot_handles(i_mic_to_show_snippets_on), ...
      'linewidth',0.25, ...
      'color',[0 0.7 0]);
 
-% draw rectangles for each snippet on all the spectrograms
+% get info about outliers by running more_panels_for_methods_figure_1.m
+indices_of_outliers=[7 10 11 12]';
 n_example_snippets=length(example_snippets);
+is_outlier=false(n_example_snippets);
+is_outlier(indices_of_outliers)=true;
+
+% draw rectangles for each snippet on all the spectrograms
 for i_example_snippet=1:n_example_snippets
   this_snippet=example_snippets(i_example_snippet);
   t_lo=dt*(this_snippet.start_sample_fine-1);  %s
@@ -215,14 +230,21 @@ for i_example_snippet=1:n_example_snippets
   t_hi_rel=t_hi-t_segment_start;  %s
   f_lo=this_snippet.lf_fine;
   f_hi=this_snippet.hf_fine;
+  if is_outlier(i_example_snippet)
+    clr=[0.7 0 0];
+    z=3;
+  else
+    clr=[0 0 0.7];
+    z=2;
+  end
   for i_mic=i_mic_to_show_snippets_on ,
     line('parent',subplot_handles(i_mic), ...
          'xdata',1000*[t_lo_rel t_hi_rel t_hi_rel t_lo_rel t_lo_rel], ...
          'ydata',[f_lo f_lo f_hi f_hi f_lo], ...
+         'zdata',z*[1 1 1 1 1], ...
          'linewidth',0.25, ...
-         'color',[0 0 0.7]);
+         'color',clr);
   end
 end
-
 
 
