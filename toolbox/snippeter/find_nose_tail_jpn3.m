@@ -7,6 +7,14 @@ function [nose_x nose_y tail_x tail_y xout yout aout bout thetaout] = find_nose_
 % x,y are the x/y position of the center of the mouse ellipse in meters
 % a,b are the major and minor axes of the ellipse (not radii)
 % theta is the clockwise angle from the positive x-axis
+%
+% Note: This function as used is problematical.  It assumes that m1(i,j).m_afA
+% and m1(i,j).m_afB are the length of the major and minor axes of the
+% ellipse (as opposed to the lengths of the semi-major and semi-minor
+% axes).  But if m1 came from Motr (which they do, as used), .m_afA will
+% hold the semi-major axis length, and .m_afB will hold the semi-minor axis
+% length.  So as used, this is returning the location of the "chest" and
+% "abdomen", not the nose and tail.  --ALT, 2013-08-30
 
 x = m1(1,mouse_num).m_afX;
 y = m1(1,mouse_num).m_afY; %y position

@@ -9,10 +9,12 @@ args.quantify_confidence=false;  % calculate P-vals, CRs (that's
                                  % what makes it not "raw")
 args.return_big_things=true;  % return the full map and other large
                               % data structures
+are_positions_on_disk_in_old_style_coords=true;  % uses Josh's coord convention from the pre-Motr days
 
 cache_file_name='more_panels_for_methods_figure_1_cache.mat';
-if ~exist(cache_file_name,'file') ,     
+if ~exist(cache_file_name,'file') ,
   % identifying info for the segment
+  frame_height_in_pels=768;
   date_str='06132012';
   letter_str='D';
   i_segment=51;  % this was voc84 in the old-style
@@ -43,6 +45,8 @@ if ~exist(cache_file_name,'file') ,
                                   date_str, ...
                                   letter_str, ...
                                   i_segment, ...
+                                  are_positions_on_disk_in_old_style_coords, ...
+                                  frame_height_in_pels, ...
                                   args, ...
                                   verbosity);
 
@@ -87,36 +91,6 @@ dt=1/fs;  % s
 n_snippets=length(syl_name_all_snippets)
 n_pairs=nchoosek(K,2);
 
-% need to do outlier filtering on r_est here
-[is_outlier,~,r_est_trans,Covariance_matrix] = kur_rce(r_est_all_snippets',1);
-is_outlier=logical(is_outlier);
-indices_of_outliers=find(is_outlier)
-r_est=r_est_trans';
-n_outliers=sum(is_outlier)
-
-% filter out the outliers
-is_keeper=~is_outlier;
-n_keepers=sum(is_keeper);
-rsrp_grid_all_keepers=rsrp_grid_all_snippets(:,:,is_keeper);
-r_est_all_keepers=r_est_all_snippets(:,is_keeper);
-r_est_all_outliers=r_est_all_snippets(:,is_outlier);
-
-% take the mean of the maps for all the non-outliers
-rsrp_grid=mean(rsrp_grid_all_keepers,3);
-r_head=mean(r_head_all_snippets,2);
-r_tail=mean(r_tail_all_snippets,2);
-
-% make up some mouse locations
-n_fake_mice=3;
-[r_head_fake,r_tail_fake]= ...
-  random_mouse_locations(R,r_head,r_tail,n_fake_mice);
-
-% caclulate the density at the real+fake mice, and the posterior
-% probability
-r_head_real_and_fake=[r_head r_head_fake];
-p_head_real_and_fake=mvnpdf(r_head_real_and_fake',r_est',Covariance_matrix)  % density
-P_posterior_head_real_and_fake= ...
-  p_head_real_and_fake/sum(p_head_real_and_fake)  % posterior probability
 
 % figure setup
 % set the default to be that figures print the same size as on-screen
@@ -141,65 +115,6 @@ clr_mike=[1 0 0 ; ...
           0 0 1 ; ...
           0 0.8 0.8 ];
 
-%
-% make a figure of the mean objective funtion, and the position estimates
-%
-rsrp_abs_max=max(max(abs(rsrp_grid)));
-title_str=sprintf('%s %s seg %d', ...
-                  date_str,letter_str,i_segment);
-colorbar_label_str='RSRP/sample (mV^2)';         
-clr_anno=[0 0 0];
-
-w_fig=4.5; % in
-h_fig=3; % in
-w_axes=1.8;  % in
-h_axes=1.8;  % in
-w_colorbar=0.1;  % in
-w_colorbar_spacer=0.05;  % in
-
-fig_h=figure('color','w');
-set_figure_size_explicit(fig_h,[w_fig h_fig]);
-axes_h=axes('parent',fig_h);
-set(axes_h,'fontsize',7);
-set_axes_size_fixed_center_explicit(axes_h,[w_axes h_axes])
-
-place_objective_map_in_axes(axes_h, ...
-                            x_grid,y_grid,10^6*rsrp_grid/N, ...
-                            @bipolar_red_white_blue, ...
-                            10^6*rsrp_abs_max/N*[-1 +1], ...
-                            title_str, ...
-                            clr_mike, ...
-                            clr_anno, ...
-                            r_est,[], ...
-                            R,r_head,r_tail);
-fake_mice_handles=draw_mice_given_head_and_tail(axes_h,r_head_fake,r_tail_fake,1);
-line('parent',axes_h, ...
-     'xdata',100*r_est_all_keepers(1,:), ...
-     'ydata',100*r_est_all_keepers(2,:), ...
-     'zdata',ones(1,n_keepers), ...
-     'marker','+', ...
-     'linestyle','none', ...
-     'color','k');
-line('parent',axes_h, ...
-     'xdata',100*r_est_all_outliers(1,:), ...
-     'ydata',100*r_est_all_outliers(2,:), ...
-     'zdata',ones(1,n_outliers), ...
-     'marker','o', ...
-     'linestyle','none', ...
-     'color','k');
-hold on;
-h_error_ellipse=error_ellipse('mu',100*r_est,'C',100^2*Covariance_matrix,'conf',0.95);
-hold off;
-set(h_error_ellipse,'color','k');
-title(axes_h,title_str,'interpreter','none','fontsize',7);
-h=xlabel(axes_h,'');  delete(h);
-h=ylabel(axes_h,'');  delete(h);
-set(axes_h,'ytick',[]);
-set(axes_h,'xtick',[40 60]);
-
-axes_cb_h=add_colorbar(axes_h,w_colorbar,w_colorbar_spacer);
-set(axes_cb_h,'fontsize',7);
-ylabel(axes_cb_h,colorbar_label_str);
 
 
 for i_snippet=i_snippet_pretty
@@ -349,5 +264,119 @@ for i_snippet=i_snippet_pretty
 
   %close all;
 end  % for i_snippets=...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% need to do outlier filtering on r_est here
+[is_outlier,~,r_est_trans,Covariance_matrix] = kur_rce(r_est_all_snippets',1);
+is_outlier=logical(is_outlier);
+indices_of_outliers=find(is_outlier)
+r_est=r_est_trans';
+n_outliers=sum(is_outlier)
+
+% filter out the outliers
+is_keeper=~is_outlier;
+n_keepers=sum(is_keeper);
+rsrp_grid_all_keepers=rsrp_grid_all_snippets(:,:,is_keeper);
+r_est_all_keepers=r_est_all_snippets(:,is_keeper);
+r_est_all_outliers=r_est_all_snippets(:,is_outlier);
+
+% take the mean of the maps for all the non-outliers
+rsrp_grid=mean(rsrp_grid_all_keepers,3);
+r_head=mean(r_head_all_snippets,2);
+r_tail=mean(r_tail_all_snippets,2);
+
+% make up some mouse locations
+n_fake_mice=3;
+%[r_head_fake,r_tail_fake]= ...
+%  random_mouse_locations(R,r_head,r_tail,n_fake_mice);
+% These were a nice-looking sample:
+r_head_fake = ...
+   [     0.445553008346868         0.709662308265758         0.522328094818333 ; ...
+         0.334817684474456         0.419620179150835         0.582494615220904 ];
+r_tail_fake = ...
+   [     0.473832772083876         0.636316477631333         0.556192459384125 ; ...
+         0.257019105608912         0.381243714500405         0.658029830339911 ];
+
+% caclulate the density at the real+fake mice, and the posterior
+% probability
+r_head_real_and_fake=[r_head r_head_fake];
+p_head_real_and_fake=mvnpdf(r_head_real_and_fake',r_est',Covariance_matrix)  % density
+P_posterior_head_real_and_fake= ...
+  p_head_real_and_fake/sum(p_head_real_and_fake)  % posterior probability
+
+
+%
+% make a figure of the mean objective funtion, and the position estimates
+%
+rsrp_abs_max=max(max(abs(rsrp_grid)));
+title_str=sprintf('%s %s seg %d', ...
+                  date_str,letter_str,i_segment);
+colorbar_label_str='RSRP/sample (mV^2)';         
+clr_anno=[0 0 0];
+
+w_fig=4.5; % in
+h_fig=3; % in
+w_axes=1.8;  % in
+h_axes=1.8;  % in
+w_colorbar=0.1;  % in
+w_colorbar_spacer=0.05;  % in
+
+fig_h=figure('color','w');
+set_figure_size_explicit(fig_h,[w_fig h_fig]);
+axes_h=axes('parent',fig_h);
+set(axes_h,'fontsize',7);
+set_axes_size_fixed_center_explicit(axes_h,[w_axes h_axes])
+
+place_objective_map_in_axes(axes_h, ...
+                            x_grid,y_grid,10^6*rsrp_grid/N, ...
+                            @bipolar_red_white_blue, ...
+                            10^6*rsrp_abs_max/N*[-1 +1], ...
+                            title_str, ...
+                            clr_mike, ...
+                            clr_anno, ...
+                            r_est,[], ...
+                            R,r_head,r_tail);
+fake_mice_handles=draw_mice_given_head_and_tail(axes_h,r_head_fake,r_tail_fake,1);
+line('parent',axes_h, ...
+     'xdata',100*r_est_all_keepers(1,:), ...
+     'ydata',100*r_est_all_keepers(2,:), ...
+     'zdata',ones(1,n_keepers), ...
+     'marker','+', ...
+     'linestyle','none', ...
+     'color','k');
+line('parent',axes_h, ...
+     'xdata',100*r_est_all_outliers(1,:), ...
+     'ydata',100*r_est_all_outliers(2,:), ...
+     'zdata',ones(1,n_outliers), ...
+     'marker','o', ...
+     'linestyle','none', ...
+     'color','k');
+hold on;
+h_error_ellipse=error_ellipse('mu',100*r_est,'C',100^2*Covariance_matrix,'conf',0.95);
+hold off;
+set(h_error_ellipse,'color','k');
+title(axes_h,title_str,'interpreter','none','fontsize',7);
+%h=xlabel(axes_h,'');  delete(h);
+%h=ylabel(axes_h,'');  delete(h);
+%set(axes_h,'ytick',[]);
+%set(axes_h,'xtick',[40 60]);
+
+axes_cb_h=add_colorbar(axes_h,w_colorbar,w_colorbar_spacer);
+set(axes_cb_h,'fontsize',7);
+ylabel(axes_cb_h,colorbar_label_str);
 
 

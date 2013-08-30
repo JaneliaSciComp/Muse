@@ -1,6 +1,46 @@
 function [syl_name,i_start,i_end,f_lo,f_hi,r_head,r_tail,R,Temp, ...
-          dx,x_grid,y_grid,in_cage]= ...
-  ssl_trial_overhead(base_dir_name,data_analysis_dir_name,date_str,letter_str)
+          dx,x_grid,y_grid,in_cage,r_corners]= ...
+  ssl_trial_overhead(base_dir_name,data_analysis_dir_name,date_str,letter_str, ...
+                     are_positions_in_old_style_coords, ...
+                     frame_height_in_pels)
+
+% In the single-mouse datasets, the microphone positions in the 
+% positions_out.mat file are encoded in a strange way, with the x and y
+% coordinates swapped, but with x and y being in a traditional Cartesian
+% arrangement, with x increasing as you move right and y increasing as you
+% go up in the image frame.  We call this convention "old-style coords"
+
+% Once Josh started using Motr, he switched to not swapping x and y.  (And
+% with y increasing down, b/c that's what Motr does.)  That would be
+% "new-style", which is the default.
+
+% This function was designed assuming that the information in
+% positions_out.mat and Test_?_1_mark_corners.mat is in traditional (y
+% increases going up) Cartesian coords.  But it turns out that it also
+% works fine if the mic and corner coords are in image-style (y increases
+% going down) coords.
+
+% In any case, the r_head, r_tail, R, and r_corners output by this function
+% are all in the same coordinate system, which is a Motr-style coordinate
+% system (y increases going down), with the center of the upper-left pixels
+% at meters_per_pixel*(1,1).  To keep the 3D coord system right-handed,
+% that means that a microphone above the plane of the floor will have a
+% negative z coordinate.
+
+% Also worth noting is that x_grid, y_grid, and in_cage are kind of funky.
+% in_cage(i,j) tells whether <x_grid(i,j),y_grid(i,j)> is in the cage (i.e.
+% on the floor) or not (i.e. on the walls).  So that's normal.  But
+% x_grid(i,j) increases as i increases (j doesn't matter), and y_grid(i,j)
+% increases as j increases (i doesn't matter), which is unusual.  <x_grid(i,j),y_grid(i,j)>
+% is in the same coordinate system as R and r_corners, so that's good.
+% Also, x_grid/y_grid/in_cage is not the same size as the video frames,
+% partly because it needs to be much finer than the pixel grid, and partly
+% because this function doesn't actually know the video frame dimensions.
+
+if ~exist('are_positions_in_old_style_coords','var') || ...
+   isempty(are_positions_in_old_style_coords) ,
+  are_positions_in_old_style_coords=false;
+end                
 
 % construct the experiment dir name
 % try this variant first
@@ -38,11 +78,24 @@ r_corners=load_corner_file(corner_file_name);  % m
 % load the microphone positions
 positions_out=load_anonymous(sprintf('%s/positions_out.mat',exp_dir_name));
 n_mike=4;
-R=zeros(3,n_mike);  % Mike positions in cols (in meters)
+R=zeros(2,n_mike);  % Mike positions in cols (in meters)
 R(1,:)=[positions_out.x_m];  % m
 R(2,:)=[positions_out.y_m];  % m
-R(3,:)=[positions_out.z_m];  % m
+R(3,:)=-[positions_out.z_m];  % m, negative sign makes output coord system right-handed
 clear positions_out;
+
+if are_positions_in_old_style_coords ,
+  %frame_height_in_meters=meters_per_pel*frame_height_in_pels;
+  y_offset=meters_per_pel*(frame_height_in_pels+1);
+  R(1:2,:)=flipud(R(1:2,:));  % old-style coords has x and y swapped
+  R(2,:)=y_offset-R(2,:);
+  r_corners=flipud(r_corners);
+  r_corners(2,:)=y_offset-r_corners(2,:);
+  r_head=flipud(r_head);
+  r_head(2,:)=y_offset-r_head(2,:);
+  r_tail=flipud(r_tail);
+  r_tail(2,:)=y_offset-r_tail(2,:);
+end
 
 % velocity of sound in air
 Temp = load_anonymous(sprintf('%s/temps.mat',exp_dir_name));  % C

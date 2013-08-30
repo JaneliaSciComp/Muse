@@ -9,16 +9,16 @@ clear s;
 % first things first
 n_voc=length(voc_index);
 
-% figure out what form the position data is in
-spanish=false;
-chinese=false;
+% figure out what form the video position data is in
+is_x_head_style=false;
+are_positions_from_motr=false;
 if isfield(voc_index,'pos_data')
   % this is how the older files store the position data (pre April 2013)
   if n_voc>=1
     pos=voc_index(1).pos_data;
     n_mice=length(pos);
     if n_mice>0
-      spanish=isfield(pos(1),'x_head');
+      is_x_head_style=isfield(pos(1),'x_head');
     end
   end
 else
@@ -27,7 +27,7 @@ else
   pos_index_file_name=fullfile(voc_index_dir_name,[voc_index_base_name '_Position' voc_index_extension]);
   s=load(pos_index_file_name);
   pos_index=s.mouse_position;
-  chinese=true;
+  are_positions_from_motr=true;
   if n_voc>=1
     pos=pos_index(1);
     n_mice=length(pos.pos_data_nose_x);
@@ -59,7 +59,7 @@ for i=1:n_voc
   f_hi(i) = voc_index(i).hf_fine;
 
   % get head & tail positions, in pels
-  if spanish
+  if is_x_head_style
     pos=voc_index(i).pos_data;
     for j=1:n_mice
       r_head_pels(:,i,j)=[pos(j).x_head ...
@@ -67,7 +67,7 @@ for i=1:n_voc
       r_tail_pels(:,i,j)=[pos(j).x_tail ...
                           pos(j).y_tail]';  % pels
     end
-  elseif chinese
+  elseif are_positions_from_motr
     pos=pos_index(i);
     for j=1:n_mice
       r_head_pels(:,i,j)=[pos.pos_data_nose_x(j) ...
@@ -75,8 +75,7 @@ for i=1:n_voc
       r_tail_pels(:,i,j)=[pos.pos_data_tail_x(j) ...
                           pos.pos_data_tail_y(j)]';  % pels
     end    
-  else
-    % "english"
+  else  % positions are in the voc file, and are named {nose/tail}_{x/y}
     pos=voc_index(i).pos_data;
     for j=1:n_mice
       r_head_pels(:,i,j)=[pos(j).nose_x ...
@@ -86,6 +85,19 @@ for i=1:n_voc
     end
   end
 end
+
+% the positions from motr are not actually the head and tail positions, 
+% because of an issue converting the Motr ellipses to head and tail
+% locations.  The "head" position is actually the position of a point
+% half-way from the center to the head.  Similarly for the tail.  So we'll
+% correct them here.
+r_center_pels=(r_head_pels+r_tail_pels)/2;
+dr_head_pels=2*(r_head_pels-r_center_pels);
+r_head_pels=r_center_pels+dr_head_pels;
+r_tail_pels=r_center_pels-dr_head_pels;
+
+
+
 
 % % filter out the "vocalizations" with a low-freq cutoff less than 30 kHz
 % % also, get rid of those with f_lo>f_hi, they look like just noise

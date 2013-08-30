@@ -1,15 +1,18 @@
 exp_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
 letter_str='D';
 data_analysis_dir_name='Data_analysis10';
+%session_base_name=sprintf('Test_%s_1',letter_str);
 fs=450450;  % Hz, happen to know this a priori
+%fs_video=29;  % Hz, ditto
 start_pad_duration_want=0.010;  % s
 end_pad_duration_want=0.010;  % s
 clr_mike=[1 0 0 ; ...
           0 0.7 0 ; ...
           0 0 1 ; ...
           0 0.8 0.8 ];
-
-% load the raw ax output
+%associated_video_frame_method = 'close'; %options are begin or close
+        
+% figure out the name of the stupid ax output file
 demuxed_data_dir_name = fullfile(exp_dir_name,'demux');
 ax_output_parent_dir_name=fullfile(demuxed_data_dir_name,'no_merge_only_har');
 ax_output_dir_name_pattern = sprintf('*_%s_*',letter_str);
@@ -17,7 +20,21 @@ ax_output_parent_dir_listing_struct = dir(fullfile(ax_output_parent_dir_name,ax_
 ax_output_dir_name=ax_output_parent_dir_listing_struct.name;
 ax_output_mat_file_name = sprintf('Test_%s_1_voc_list_no_merge_har.mat',letter_str);
 ax_output_mat_file_name_abs=fullfile(ax_output_parent_dir_name,ax_output_dir_name,ax_output_mat_file_name);
+
+% % read the video frame pulse data
+% yn_load_time_stamps = 'y';
+% video_pulse_start_ts = ...
+%   fn_video_pulse_start_ts(demuxed_data_dir_name, ...
+%                           exp_dir_name, ...
+%                           session_base_name, ...
+%                           session_base_name, ...
+%                           yn_load_time_stamps, ...
+%                           fs, ...
+%                           fs_video);
+
+% load the raw ax output
 mouse_from_ax=load_ax_segments(ax_output_mat_file_name_abs);
+%mouse_from_ax=load_ax_segments_and_append_frame_number(file_name,video_pulse_start_ts,associated_video_frame_method);
 
 % extract the voc we want
 example_segment_name='Voc130';
