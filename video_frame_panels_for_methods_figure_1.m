@@ -104,8 +104,8 @@ r_tail_example_segment=r_tail_all(:,is_example_snippet);
 % make the figure
 w_fig=4.5; % in
 h_fig=3; % in
-w_axes=1.8;  % in
-h_axes=1.8;  % in
+w_axes=1;  % in
+h_axes=1;  % in
 %w_colorbar=0.1;  % in
 %w_colorbar_spacer=0.05;  % in
 
