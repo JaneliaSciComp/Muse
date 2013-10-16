@@ -2,7 +2,12 @@ function blob = ...
   r_est_from_tf_rect_indicators_and_ancillary(base_dir_name,...
                                               date_str, ...
                                               letter_str, ...
-                                              args, ...
+                                              R,Temp,dx,x_grid,y_grid,in_cage, ...
+                                              tf_rect_name, ...
+                                              i_start,i_end, ...
+                                              f_lo,f_hi, ...
+                                              r_head_from_video,r_tail_from_video, ...
+                                              options, ...
                                               verbosity)
                                          
 % This function is called by r_est_from_voc_indicators() and 
@@ -16,24 +21,29 @@ function blob = ...
 % A 'tf_rect' is a time-frequency rectangle, and this function doesn't give
 % a damn whether it's a voc or a segment.
 
-% unpack args
-name_field=fieldnames(args);
+% Check arg count
+if nargin~=18 ,
+  errror('Wrong number of args to r_est_from_tf_rect_indicators_and_ancillary()');
+end
+
+% unpack options
+name_field=fieldnames(options);
 for i=1:length(name_field)
-  eval(sprintf('%s = args.%s;',name_field{i},name_field{i}));
+  eval(sprintf('%s = options.%s;',name_field{i},name_field{i}));
 end
 
 % if x_grid or y_grid is empty, re-generate them
-if isempty(x_grid) || isempty(y_grid) ,  %#ok
+if isempty(x_grid) || isempty(y_grid) ,
   [x_grid,y_grid]=grids(R,dx);
 end
 
 % If in_cage is empty, declare everything in-cage
-if isempty(in_cage) ,  %#ok
+if isempty(in_cage) ,  
   in_cage=true(size(x_grid));
 end
 
 % dimensions
-n_mice=size(r_head,2);  %#ok
+n_mice=size(r_head_from_video,2);
                                         
 % synthesize the name of the memo file
 memo_base_dir_name=fullfile(fileparts(mfilename('fullpath')),'..');
@@ -42,7 +52,7 @@ memo_dir_name=fullfile(memo_base_dir_name, ...
 memo_file_name= ...
   fullfile(memo_dir_name, ...
            sprintf('grid_%s_%s_%s.mat', ...
-                   date_str,letter_str,syl_name));
+                   date_str,letter_str,tf_rect_name));
 
 % read the grid from the memo file, or compute it                 
 if read_from_map_cache && exist(memo_file_name,'file')
@@ -123,7 +133,7 @@ d_thresh=0.01;  % cm
 r_body=zeros(2,n_mice);
 rsrp_body=zeros(1,n_mice);
 for i_mouse=1:n_mice
-  d=distance_from_point(x_grid,y_grid,r_head(:,i_mouse));
+  d=distance_from_point(x_grid,y_grid,r_head_from_video(:,i_mouse));
   is_close_to_head=(d<=d_thresh);
   % On some vocs, the stupid mouse head is actually outside the microphone
   % rectangle.  If the head is far enough out that there are no pels in the
@@ -163,8 +173,8 @@ end
 % mse_crit=rsrp_max*(dJ_crit+1);  % dJ==mse/mse_min-1, for now
 
 % % Determine MSE at the body, approximating the body as an ellipse
-r_center=(r_head+r_tail)/2;
-a_vec=r_head-r_center;  % 2 x n_mice, each col pointing forwards
+r_center=(r_head_from_video+r_tail_from_video)/2;
+a_vec=r_head_from_video-r_center;  % 2 x n_mice, each col pointing forwards
 b=normcols(a_vec)/3;  % scalar, and a guess at the half-width of the mouse
 % in_body=in_ellipse(x_grid,y_grid,r_center,a_vec,b);  % boolean mask
 % mse_body=mse_grid(in_body);
@@ -176,7 +186,7 @@ b=normcols(a_vec)/3;  % scalar, and a guess at the half-width of the mouse
 % plot the dF map
 if verbosity>=1
   title_str=sprintf('%s %s %s', ...
-                    date_str,letter_str,syl_name);
+                    date_str,letter_str,tf_rect_name);
   clr_mike=[1 0 0 ; ...
             0 0.7 0 ; ...
             0 0 1 ; ...
@@ -192,7 +202,7 @@ if verbosity>=1
                        clr_mike, ...
                        clr_anno, ...
                        r_est,[], ...
-                       R,r_head,r_tail);
+                       R,r_head_from_video,r_tail_from_video);
   for i_mouse=1:n_mice                   
     r_poly=polygon_from_ellipse(r_center(:,i_mouse), ...
                                 a_vec(:,i_mouse), ...
@@ -221,9 +231,9 @@ blob.N_filt=N_filt;
 blob.fs=fs;
 blob.i_start=i_start;
 blob.i_end=i_end;
-blob.syl_name=syl_name;
-blob.r_head=r_head;
-blob.r_tail=r_tail;
+blob.tf_rect_name=tf_rect_name;
+blob.r_head=r_head_from_video;
+blob.r_tail=r_tail_from_video;
 if return_big_things
   blob.rsrp_grid=rsrp_grid;
   blob.rsrp_per_pair_grid=rsrp_per_pair_grid;
