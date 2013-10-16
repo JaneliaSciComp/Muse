@@ -1,4 +1,5 @@
-This is Muse, which stands for something I forget.  Anyway, it does sound-source localization of ultrasonic mouse vocalizations.
+This is Muse, which stands for something I forget.  Anyway, it does
+sound-source localization of ultrasonic mouse vocalizations.
 
 generate_r_est_raw_for_single_mouse_data.m: Estimates the position of
   each vocalization in the single-mouse data set, and ancillary things
