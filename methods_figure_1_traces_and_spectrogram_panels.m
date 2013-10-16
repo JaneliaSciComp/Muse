@@ -11,7 +11,7 @@ clr_mike=[1 0 0 ; ...
           0 0 1 ; ...
           0 0.8 0.8 ];
 %associated_video_frame_method = 'close'; %options are begin or close
-        
+
 % figure out the name of the stupid ax output file
 demuxed_data_dir_name = fullfile(exp_dir_name,'demux');
 ax_output_parent_dir_name=fullfile(demuxed_data_dir_name,'no_merge_only_har');
