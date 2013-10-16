@@ -1,0 +1,13 @@
+syntax: glob
+
+._*
+.nfs*
+*.mexmaci64
+*.mexa64
+.DS_Store
+toolbox/tmt_rel_*
+*.mat
+*.eps
+*.pdf
+*.tcs
+posterior.txt
