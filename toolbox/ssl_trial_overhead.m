@@ -4,6 +4,9 @@ function [syl_name,i_start,i_end,f_lo,f_hi,r_head,r_tail,R,Temp, ...
                      are_positions_in_old_style_coords, ...
                      frame_height_in_pels)
 
+% A "trial" in the sense we use it here is a single video along with
+% the audio and other associated data.
+                   
 % In the single-mouse datasets, the microphone positions in the 
 % positions_out.mat file are encoded in a strange way, with the x and y
 % coordinates swapped, but with x and y being in a traditional Cartesian

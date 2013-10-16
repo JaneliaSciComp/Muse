@@ -2,7 +2,7 @@ function map_multiple_trials_executable(output_file_name,input_file_name)
 
 % make sure the common blob_from_voc_indicators_and_ancillary functions get
 % included in the executable:
-%#function r_est_from_voc_indicators_and_ancillary
+%#function r_est_from_tf_rect_indicators_and_ancillary
 
 load(input_file_name);
 % [r_est,dssen_head]= ...

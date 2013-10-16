@@ -11,7 +11,7 @@ args.return_big_things=true;  % return the full map and other large
                               % data structures
 are_positions_on_disk_in_old_style_coords=true;  % uses Josh's coord convention from the pre-Motr days
 
-cache_file_name='more_panels_for_methods_figure_1_cache.mat';
+cache_file_name='methods_figure_1_rsrp_maps_and_estimate_panels_cache.mat';
 if ~exist(cache_file_name,'file') ,
   % identifying info for the segment
   frame_height_in_pels=768;
