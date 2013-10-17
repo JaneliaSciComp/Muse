@@ -1,6 +1,6 @@
 % calculate stuff for all vocalizations
-verbosity=0;  % how much output or intermediate results the user wants to 
-              % see
+options.verbosity=0;  % how much output or intermediate results the user wants to 
+                      % see
 options.read_from_map_cache=false;  % whether to try to use the map cache 
                                     % to save time
 options.write_to_map_cache=false;  % whether to write to the map cache after 
@@ -46,7 +46,7 @@ if true ,
   % package up the args                                           
   args=trial_overhead;
   args.i_segment=i_segment;
-  args.verbosity=verbosity;
+  %args.verbosity=verbosity;
   
   % call the functions
   r_est_blobs = ...
