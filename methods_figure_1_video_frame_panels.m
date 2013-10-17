@@ -13,7 +13,7 @@ associated_video_frame_method = 'close'; %options are begin or close
 example_segment_id_string='Voc130';
 %i_segment=51; 
 i_snippet=16;  % index of the example snippet
-are_positions_on_disk_in_old_style_coords=true;  % uses Josh's coord convention from the pre-Motr days
+%are_positions_on_disk_in_old_style_coords=true;  % uses Josh's coord convention from the pre-Motr days
 
 %session_base_name=sprintf('Test_%s_1',letter_str);
 %fs_video=29;  % Hz, ditto
@@ -56,7 +56,7 @@ video_file_name=fullfile(exp_dir_name, ...
                          sprintf('Test_%s_1.seq',letter_str));
 video_info=fnReadSeqInfo_jpn(video_file_name);
 example_frame=fnReadFrameFromSeq(video_info,i_frame_example);
-[frame_height_in_pels,frame_width_in_pels]=size(example_frame)
+[frame_height_in_pels,frame_width_in_pels]=size(example_frame);
 %r_frame_upper_left_pel_center_pels=[1/2 size(example_frame,1)-1/2]';  
   % (non-image-style) cartesian coords of the center of the upper-left pel
 %r_frame_lower_right_pel_center_pels=[size(example_frame,2)-1/2 1/2]';  
@@ -70,9 +70,7 @@ example_frame=fnReadFrameFromSeq(video_info,i_frame_example);
   ssl_trial_overhead(base_dir_name, ...
                      data_analysis_dir_name, ...
                      date_str, ...
-                     letter_str, ...
-                     are_positions_on_disk_in_old_style_coords, ...
-                     frame_height_in_pels);
+                     letter_str);
 n_mics=size(R,2);
 
 %xl_example_frame_pels=[1 size(example_frame,2)];

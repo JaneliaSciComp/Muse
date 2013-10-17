@@ -1,21 +1,19 @@
 % calculate stuff for all vocalizations
 verbosity=0;  % how much output or intermediate results the user wants to 
               % see
-args.read_from_map_cache=false;  % whether to try to use the map cache 
-                                % to save time
-args.write_to_map_cache=false;  % whether to write to the map cache after 
-                               % calculating a map de novo
-args.quantify_confidence=false;  % calculate P-vals, CRs (that's
+options.read_from_map_cache=false;  % whether to try to use the map cache 
+                                    % to save time
+options.write_to_map_cache=false;  % whether to write to the map cache after 
+                                   % calculating a map de novo
+options.quantify_confidence=false;  % calculate P-vals, CRs (that's
                                  % what makes it not "raw")
-args.return_big_things=true;  % return the full map and other large
-                              % data structures
-are_positions_on_disk_in_old_style_coords=true;  % uses Josh's coord convention from the pre-Motr days
+options.return_big_things=true;  % return the full map and other large
+                                 % data structures
 
 cache_file_name='methods_figure_1_rsrp_maps_and_estimate_panels_cache.mat';
 %if ~exist(cache_file_name,'file') ,
 if true ,
   % identifying info for the segment
-  frame_height_in_pels=768;
   date_str='06132012';
   letter_str='D';
   i_segment=51;  % this was voc84 in the old-style
@@ -40,17 +38,19 @@ if true ,
   %                          @r_est_from_voc_indicators_and_ancillary_for_a_few_vocs, ...
   %                          args, ...
   %                          verbosity);
-  [r_est_blobs,trial_overhead]= ...
-    r_est_from_segment_indicators(base_dir_name,...
-                                  data_analysis_dir_name, ...
-                                  date_str, ...
-                                  letter_str, ...
-                                  i_segment, ...
-                                  are_positions_on_disk_in_old_style_coords, ...
-                                  frame_height_in_pels, ...
-                                  args, ...
-                                  [], ...
-                                  verbosity);
+  trial_overhead=ssl_trial_overhead_packaged(base_dir_name,...
+                                             data_analysis_dir_name, ...
+                                             date_str, ...
+                                             letter_str);
+
+  % package up the args                                           
+  args=trial_overhead;
+  args.i_segment=i_segment;
+  args.verbosity=verbosity;
+  
+  % call the functions
+  r_est_blobs = ...
+    r_est_from_segment_indicators_and_trial_overhead(args,options);
 
   % % save everything           
   % load('analysis_for_methods_figure_1.mat');
@@ -68,12 +68,12 @@ if true ,
   clear r_est_blobs;
 
   % transform things from cell arrays what can
-  n_snippets=length(syl_name_all_snippets);  
+  n_snippets=length(tf_rect_name_all_snippets);  
   rsrp_grid_all_snippets=cell2mat(reshape(rsrp_grid_all_snippets,[1 1 n_snippets]));
   %rsrp_per_pair_grid_all_snippets=cell2mat(reshape(rsrp_per_pair_grid_all_snippets,[1 1 1 n_snippets]));
   r_est_all_snippets=cell2mat(reshape(r_est_all_snippets,[1 n_snippets]));
-  r_head_all_snippets=cell2mat(reshape(r_head_all_snippets,[1 n_snippets]));
-  r_tail_all_snippets=cell2mat(reshape(r_tail_all_snippets,[1 n_snippets]));
+  r_head_from_video_all_snippets=cell2mat(reshape(r_head_from_video_all_snippets,[1 n_snippets]));
+  r_tail_from_video_all_snippets=cell2mat(reshape(r_tail_from_video_all_snippets,[1 n_snippets]));
 
   % unpack the trial overhead
   R=trial_overhead.R;
@@ -93,9 +93,8 @@ end
 N=size(v_all_snippets{1},1);  % all same length
 K=size(R,2);
 dt=1/fs;  % s
-n_snippets=length(syl_name_all_snippets)
+n_snippets=length(tf_rect_name_all_snippets)
 n_pairs=nchoosek(K,2);
-
 
 % figure setup
 % set the default to be that figures print the same size as on-screen
@@ -124,15 +123,15 @@ clr_mike=[1 0 0 ; ...
 
 for i_snippet=i_snippet_pretty
   % unpack stuff for this snippet
-  syl_name=syl_name_all_snippets{i_snippet};
+  tf_rect_name=tf_rect_name_all_snippets{i_snippet};
   v=v_all_snippets{i_snippet};  %#ok
   V_filt=V_filt_all_snippets{i_snippet};  %#ok
   a=a_all_snippets{i_snippet};  %#ok
   rsrp_grid=rsrp_grid_all_snippets(:,:,i_snippet);
   %rsrp_per_pair_grid=rsrp_per_pair_grid_all_snippets(:,:,:,i_snippet);
   r_est=r_est_all_snippets(:,i_snippet);
-  r_head=r_head_all_snippets(:,i_snippet);
-  r_tail=r_tail_all_snippets(:,i_snippet);
+  r_head_from_video=r_head_from_video_all_snippets(:,i_snippet);
+  r_tail_from_video=r_tail_from_video_all_snippets(:,i_snippet);
   
   % useful stuff        
   N=size(v,1);
@@ -197,8 +196,8 @@ for i_snippet=i_snippet_pretty
   % rms_total_disp=1e3*rms_total
 
   % % extrapolate a mouse ellipse
-  % r_center=(r_head+r_tail)/2;
-  % a_vec=r_head-r_center;  % vector
+  % r_center=(r_head_from_video+r_tail)/2;
+  % a_vec=r_head_from_video-r_center;  % vector
   % b=norm(a_vec)/3;  % scalar, and a guess at the half-width of the mouse
 
   % Compute the CR borders from the objective function and critical value
@@ -209,7 +208,7 @@ for i_snippet=i_snippet_pretty
   % make a figure of the objective funtion, estimate
   rsrp_abs_max=max(max(abs(rsrp_grid)));
   title_str=sprintf('%s %s %s', ...
-                    date_str,letter_str,syl_name);
+                    date_str,letter_str,tf_rect_name);
   colorbar_label_str='RSRP/sample (mV^2)';         
   clr_anno=[0 0 0];
 
@@ -234,7 +233,7 @@ for i_snippet=i_snippet_pretty
                               clr_mike, ...
                               clr_anno, ...
                               r_est,[], ...
-                              R,r_head,r_tail);
+                              R,r_head_from_video,r_tail_from_video);
   title(axes_h,title_str,'interpreter','none','fontsize',7);
   h=xlabel(axes_h,'');  delete(h);
   h=ylabel(axes_h,'');  delete(h);
@@ -265,7 +264,7 @@ for i_snippet=i_snippet_pretty
                                        clr_mike, ...
                                        clr_anno, ...
                                        r_est,[], ...
-                                       R,r_head,r_tail);
+                                       R,r_head_from_video,r_tail_from_video);
 
   %close all;
 end  % for i_snippets=...
@@ -301,26 +300,26 @@ r_est_all_outliers=r_est_all_snippets(:,is_outlier);
 
 % take the mean of the maps for all the non-outliers
 rsrp_grid=mean(rsrp_grid_all_keepers,3);
-r_head=mean(r_head_all_snippets,2);
-r_tail=mean(r_tail_all_snippets,2);
+r_head_from_video=mean(r_head_from_video_all_snippets,2);
+r_tail_from_video=mean(r_tail_from_video_all_snippets,2);
 
 % make up some mouse locations
 n_fake_mice=3;
-%[r_head_fake,r_tail_fake]= ...
-%  random_mouse_locations(R,r_head,r_tail,n_fake_mice);
+%[r_head_from_video_fake,r_tail_from_video_fake]= ...
+%  random_mouse_locations(R,r_head_from_video,r_tail_from_video,n_fake_mice);
 % These were a nice-looking sample:
-r_head_fake = ...
+r_head_from_video_fake = ...
    [     0.445553008346868         0.709662308265758         0.522328094818333 ; ...
          0.334817684474456         0.419620179150835         0.582494615220904 ];
-r_tail_fake = ...
+r_tail_from_video_fake = ...
    [     0.473832772083876         0.636316477631333         0.556192459384125 ; ...
          0.257019105608912         0.381243714500405         0.658029830339911 ];
 
 % caclulate the density at the real+fake mice, and the posterior
 % probability
-r_head_real_and_fake=[r_head r_head_fake];
-p_head_real_and_fake=mvnpdf(r_head_real_and_fake',r_est',Covariance_matrix)  % density
-P_posterior_head_real_and_fake= ...
+r_head_from_video_real_and_fake=[r_head_from_video r_head_from_video_fake];
+p_head_real_and_fake=mvnpdf(r_head_from_video_real_and_fake',r_est',Covariance_matrix)  % density
+P_posterior_head_from_video_real_and_fake= ...
   p_head_real_and_fake/sum(p_head_real_and_fake)  % posterior probability
 
 
@@ -354,8 +353,8 @@ place_objective_map_in_axes(axes_h, ...
                             clr_mike, ...
                             clr_anno, ...
                             r_est,[], ...
-                            R,r_head,r_tail);
-fake_mice_handles=draw_mice_given_head_and_tail(axes_h,r_head_fake,r_tail_fake,1);
+                            R,r_head_from_video,r_tail_from_video);
+fake_mice_handles=draw_mice_given_head_and_tail(axes_h,r_head_from_video_fake,r_tail_from_video_fake,1);
 line('parent',axes_h, ...
      'xdata',100*r_est_all_keepers(1,:), ...
      'ydata',100*r_est_all_keepers(2,:), ...

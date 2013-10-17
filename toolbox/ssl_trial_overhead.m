@@ -1,8 +1,6 @@
 function [syl_name,i_start,i_end,f_lo,f_hi,r_head,r_tail,R,Temp, ...
           dx,x_grid,y_grid,in_cage,r_corners,fs]= ...
-  ssl_trial_overhead(base_dir_name,data_analysis_dir_name,date_str,letter_str, ...
-                     are_positions_in_old_style_coords, ...
-                     frame_height_in_pels)
+  ssl_trial_overhead(base_dir_name,data_analysis_dir_name,date_str,letter_str)
 
 % A "trial" in the sense we use it here is a single video along with
 % the audio and other associated data.
@@ -87,7 +85,16 @@ R(2,:)=[positions_out.y_m];  % m
 R(3,:)=-[positions_out.z_m];  % m, negative sign makes output coord system right-handed
 clear positions_out;
 
+are_positions_in_old_style_coords=~isempty(strfind(base_dir_name,'ssl_sys_test'));
+  % single-mouse data uses old-style coords, multi-mouse data uses Motr
+  % coords
+
 if are_positions_in_old_style_coords ,
+  video_file_name=fullfile(exp_dir_name, ...
+                           sprintf('Test_%s_1.seq',letter_str));
+  video_info=fnReadSeqInfo_jpn(video_file_name);
+  frame_height_in_pels=video_info.m_iHeight;
+  %frame_height_in_pels=768;  % this is always the case for Josh's videos
   %frame_height_in_meters=meters_per_pel*frame_height_in_pels;
   y_offset=meters_per_pel*(frame_height_in_pels+1);
   R(1:2,:)=flipud(R(1:2,:));  % old-style coords has x and y swapped
