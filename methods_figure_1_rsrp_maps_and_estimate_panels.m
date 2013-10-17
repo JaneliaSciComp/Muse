@@ -12,7 +12,8 @@ args.return_big_things=true;  % return the full map and other large
 are_positions_on_disk_in_old_style_coords=true;  % uses Josh's coord convention from the pre-Motr days
 
 cache_file_name='methods_figure_1_rsrp_maps_and_estimate_panels_cache.mat';
-if ~exist(cache_file_name,'file') ,
+%if ~exist(cache_file_name,'file') ,
+if true ,
   % identifying info for the segment
   frame_height_in_pels=768;
   date_str='06132012';
@@ -48,6 +49,7 @@ if ~exist(cache_file_name,'file') ,
                                   are_positions_on_disk_in_old_style_coords, ...
                                   frame_height_in_pels, ...
                                   args, ...
+                                  [], ...
                                   verbosity);
 
   % % save everything           
@@ -74,10 +76,13 @@ if ~exist(cache_file_name,'file') ,
   r_tail_all_snippets=cell2mat(reshape(r_tail_all_snippets,[1 n_snippets]));
 
   % unpack the trial overhead
-  field_name=fieldnames(trial_overhead);
-  for i=1:length(field_name)
-    eval(sprintf('%s=trial_overhead.%s;',field_name{i},field_name{i}));
-  end
+  R=trial_overhead.R;
+  Temp=trial_overhead.Temp;
+  dx=trial_overhead.dx;
+  x_grid=trial_overhead.x_grid;
+  y_grid=trial_overhead.y_grid;
+  in_cage=trial_overhead.in_cage;
+  fs=trial_overhead.fs;
   clear trial_overhead;
   save(cache_file_name);
 else

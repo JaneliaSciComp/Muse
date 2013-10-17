@@ -1,4 +1,4 @@
-function [r_est_blobs,overhead]= ...
+function [r_est_blobs,trial_overhead]= ...
   r_est_from_segment_indicators(base_dir_name,...
                                 data_analysis_dir_name, ...
                                 date_str, ...
@@ -11,35 +11,42 @@ function [r_est_blobs,overhead]= ...
                                 verbosity)
 
 % do all the stuff we only have to do once per trial, unless it's been
-% pre-computed
+% pre-computed and passed in
 if isempty(trial_overhead) ,
-  [syl_name_all,i_start_all,i_end_all,f_lo_all,f_hi_all, ...
-   r_head_all,r_tail_all,R,Temp, ...
-   dx,x_grid,y_grid,in_cage]= ...
-    ssl_trial_overhead(base_dir_name, ...
-                       data_analysis_dir_name, ...
-                       date_str, ...
-                       letter_str, ...
-                       are_positions_in_old_style_coords, ...
-                       frame_height_in_pels);
-else
-  % unpack the contents of trial overhead
-  field_names=fieldnames(trial_overhead);
-  for i=1:length(field_names) ,
-    eval(sprintf('%s=trial_overhead.(field_names{i});',field_names{i}));
-  end
-end  
+   trial_overhead= ...
+    ssl_trial_overhead_packaged(base_dir_name, ...
+                                data_analysis_dir_name, ...
+                                date_str, ...
+                                letter_str, ...
+                                are_positions_in_old_style_coords, ...
+                                frame_height_in_pels);
+end
+
+% unpack the contents of trial_overhead
+tf_rect_name_all=trial_overhead.tf_rect_name;
+i_start_all=trial_overhead.i_start;
+i_end_all=trial_overhead.i_end;
+f_lo_all=trial_overhead.f_lo;
+f_hi_all=trial_overhead.f_hi;
+r_head_all=trial_overhead.r_head_from_video;
+r_tail_all=trial_overhead.r_tail_from_video;
+R=trial_overhead.R;
+Temp=trial_overhead.Temp;
+dx=trial_overhead.dx;
+x_grid=trial_overhead.x_grid;
+y_grid=trial_overhead.y_grid;
+in_cage=trial_overhead.in_cage;
 
 % filter out the snippets (i.e. syls) that don't match i_segment
-if ~isempty(syl_name_all) ,
-  syl_name_all_first=syl_name_all{1};
+if ~isempty(tf_rect_name_all) ,
+  syl_name_all_first=tf_rect_name_all{1};
   if length(syl_name_all_first)~=17 ,
     error('The "syllable" "names" appear to be in the wrong format.');
   end
-  i_segment_all_as_string=cellfun(@(s)s(4:9),syl_name_all,'UniformOutput',false);
+  i_segment_all_as_string=cellfun(@(s)s(4:9),tf_rect_name_all,'UniformOutput',false);
   i_segment_all=str2double(i_segment_all_as_string);
   keep=(i_segment_all==i_segment);
-  syl_name_keep=syl_name_all(keep);
+  syl_name_keep=tf_rect_name_all(keep);
   i_start_keep=i_start_all(keep);
   i_end_keep=i_end_all(keep);
   f_lo_keep=f_lo_all(keep);
@@ -48,13 +55,13 @@ if ~isempty(syl_name_all) ,
   r_tail_keep=r_tail_all(:,keep,:);    
 end
 
-% package up all the trial overhead for return
-overhead.R=R;
-overhead.Temp=Temp;
-overhead.dx=dx;
-overhead.x_grid=x_grid;
-overhead.y_grid=y_grid;
-overhead.in_cage=in_cage;
+% % package up all the trial overhead for return
+% overhead.R=R;
+% overhead.Temp=Temp;
+% overhead.dx=dx;
+% overhead.x_grid=x_grid;
+% overhead.y_grid=y_grid;
+% overhead.in_cage=in_cage;
 
 % % pack up the arguments that don't change across snippets
 % args_template_and_overhead=merge_scalar_structs(options,overhead);
@@ -95,8 +102,8 @@ for i_snippet=1:n_snippets ,
   
   if i_snippet==1
     r_est_blobs=r_est_blob_this;
-    fs=r_est_blob_this.fs;
-    overhead.fs=fs;
+    %fs=r_est_blob_this.fs;
+    %overhead.fs=fs;
   else
     r_est_blobs(i_snippet)=r_est_blob_this;
   end
