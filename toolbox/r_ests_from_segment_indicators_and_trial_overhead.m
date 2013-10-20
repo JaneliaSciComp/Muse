@@ -1,5 +1,8 @@
 function r_est_blobs= ...
-  r_est_from_segment_indicators_and_trial_overhead(args,options)
+  r_ests_from_segment_indicators_and_trial_overhead(args,options)
+
+% Estimates position for all snippets in the given segment, and returns the
+% per-snippet estimates
 
 % unpack all the args
 field_names=fieldnames(args);
@@ -76,16 +79,6 @@ for i_snippet=1:n_snippets ,
                                                 f_lo_this,f_hi_this, ...
                                                 r_head_from_video_this,r_tail_from_video_this, ...
                                                 options);
-
-  % throw some args into the returned blob
-  %args_field_name=fieldnames(args);
-  r_est_blob_this.tf_rect_name=tf_rect_name_this;
-  r_est_blob_this.i_start=i_start_this;
-  r_est_blob_this.i_end=i_end_this;
-  r_est_blob_this.f_lo=f_lo_this;
-  r_est_blob_this.f_hi=f_hi_this;
-  r_est_blob_this.r_head_from_video=r_head_from_video_this;
-  r_est_blob_this.r_tail_from_video=r_tail_from_video_this;
   
   if i_snippet==1
     r_est_blobs=r_est_blob_this;
@@ -97,4 +90,3 @@ for i_snippet=1:n_snippets ,
 end
 
 end
-

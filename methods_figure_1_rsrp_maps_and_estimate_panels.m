@@ -50,7 +50,7 @@ if true ,
   
   % call the functions
   r_est_blobs = ...
-    r_est_from_segment_indicators_and_trial_overhead(args,options);
+    r_ests_from_segment_indicators_and_trial_overhead(args,options);
 
   % % save everything           
   % load('analysis_for_methods_figure_1.mat');

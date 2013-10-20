@@ -129,8 +129,8 @@ ms_total=sum(sum(abs(V_filt).^2))/(N^2*K);
 
 % Determine RSRP at the head, which we call rsrp_body for historical reasons
 d_thresh=0.01;  % cm
-r_body=zeros(2,n_mice);
-rsrp_body=zeros(1,n_mice);
+r_rsrp_near_head=zeros(2,n_mice);
+rsrp_near_head=zeros(1,n_mice);
 for i_mouse=1:n_mice
   d=distance_from_point(x_grid,y_grid,r_head_from_video(:,i_mouse));
   is_close_to_head=(d<=d_thresh);
@@ -142,16 +142,16 @@ for i_mouse=1:n_mice
   if some_pels_close_to_head
     rsrp_close_to_head=rsrp_grid(is_close_to_head);
     [~,k_star]=min(rsrp_close_to_head);
-    rsrp_body(i_mouse)=rsrp_close_to_head(k_star);
+    rsrp_near_head(i_mouse)=rsrp_close_to_head(k_star);
     x_close_to_head=x_grid(is_close_to_head);
     y_close_to_head=y_grid(is_close_to_head);
-    r_body(:,i_mouse)=[x_close_to_head(k_star);y_close_to_head(k_star)];
+    r_rsrp_near_head(:,i_mouse)=[x_close_to_head(k_star);y_close_to_head(k_star)];
   else
-    rsrp_body(i_mouse)=nan;
-    r_body(:,i_mouse)=[nan;nan];
+    rsrp_near_head(i_mouse)=nan;
+    r_rsrp_near_head(:,i_mouse)=[nan;nan];
   end
 end
-  
+
 % % load the empirical cdf curve
 % conf_level=0.68;
 % if quantify_confidence && exist('cdf_dJ_emp_unique.mat','file')
@@ -208,7 +208,7 @@ if verbosity>=1
                                 b(i_mouse));
     line(100*r_poly(1,:),100*r_poly(2,:),'color',clr_anno);
   end
-  line(100*r_body(1,:),100*r_body(2,:),zeros(1,n_mice), ...
+  line(100*r_rsrp_near_head(1,:),100*r_rsrp_near_head(2,:),zeros(1,n_mice), ...
        'marker','o','linestyle','none','color',clr_anno, ...
        'markersize',6);
   
@@ -220,19 +220,22 @@ blob=struct();
 blob.r_est=r_est;
 blob.rsrp_max=rsrp_max;
 %blob.mse_crit=mse_crit;
-blob.rsrp_body=rsrp_body;
+blob.rsrp_near_head=rsrp_near_head;
 %blob.P_body=P_body;
-blob.r_body=r_body;
+blob.r_rsrp_near_head=r_rsrp_near_head;
 blob.ms_total=ms_total;
 blob.a=a;
 blob.N=N;
 blob.N_filt=N_filt;
 blob.fs=fs;
+blob.f_lo=f_lo;
+blob.f_hi=f_hi;
+blob.tf_rect_name=tf_rect_name;
 blob.i_start=i_start;
 blob.i_end=i_end;
 blob.tf_rect_name=tf_rect_name;
-blob.r_head=r_head_from_video;
-blob.r_tail=r_tail_from_video;
+blob.r_head_from_video=r_head_from_video;
+blob.r_tail_from_video=r_tail_from_video;
 if return_big_things
   blob.rsrp_grid=rsrp_grid;
   blob.rsrp_per_pair_grid=rsrp_per_pair_grid;

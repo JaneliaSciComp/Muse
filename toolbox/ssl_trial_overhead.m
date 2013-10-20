@@ -1,4 +1,4 @@
-function [syl_name,i_start,i_end,f_lo,f_hi,r_head,r_tail,R,Temp, ...
+function [syl_name,i_start,i_end,f_lo,f_hi,r_head_from_video,r_tail_from_video,R,Temp, ...
           dx,x_grid,y_grid,in_cage,r_corners,fs]= ...
   ssl_trial_overhead(base_dir_name,data_analysis_dir_name,date_str,letter_str)
 
@@ -58,7 +58,7 @@ voc_index_file_name= ...
            sprintf('%s/Test_%s_1_Mouse.mat', ...
                    data_analysis_dir_name, ...
                    letter_str));
-[syl_name,i_start,i_end,f_lo,f_hi,r_head_pels,r_tail_pels]= ...
+[syl_name,i_start,i_end,f_lo,f_hi,r_head_from_video_pels,r_tail_from_video_pels]= ...
   read_voc_index(voc_index_file_name);
 %n_voc=length(i_syl);
 
@@ -67,8 +67,8 @@ meters_per_pel= ...
   load_anonymous(sprintf('%s/meters_2_pixels.mat',exp_dir_name));  % m/pel
 
 % convert the head and tail positions
-r_head=meters_per_pel*r_head_pels;  % m
-r_tail=meters_per_pel*r_tail_pels;  % m
+r_head_from_video=meters_per_pel*r_head_from_video_pels;  % m
+r_tail_from_video=meters_per_pel*r_tail_from_video_pels;  % m
 
 % read the cage bounds
 corner_file_name= ...
@@ -101,10 +101,10 @@ if are_positions_in_old_style_coords ,
   R(2,:)=y_offset-R(2,:);
   r_corners=flipud(r_corners);
   r_corners(2,:)=y_offset-r_corners(2,:);
-  r_head=flipud(r_head);
-  r_head(2,:)=y_offset-r_head(2,:);
-  r_tail=flipud(r_tail);
-  r_tail(2,:)=y_offset-r_tail(2,:);
+  r_head_from_video=flipud(r_head_from_video);
+  r_head_from_video(2,:)=y_offset-r_head_from_video(2,:);
+  r_tail_from_video=flipud(r_tail_from_video);
+  r_tail_from_video(2,:)=y_offset-r_tail_from_video(2,:);
 end
 
 % velocity of sound in air

@@ -1,4 +1,4 @@
-function [syl_name,i_start,i_end,f_lo,f_hi,r_head_pels,r_tail_pels]= ...
+function [syl_name,i_start,i_end,f_lo,f_hi,r_head_from_video_pels,r_tail_from_video_pels]= ...
   read_voc_index(voc_index_file_name)
 
 % load the index
@@ -42,8 +42,8 @@ i_start=zeros(n_voc,1);
 i_end=zeros(n_voc,1);
 f_lo=zeros(n_voc,1);
 f_hi=zeros(n_voc,1);
-r_head_pels=zeros(2,n_voc,n_mice);
-r_tail_pels=zeros(2,n_voc,n_mice);
+r_head_from_video_pels=zeros(2,n_voc,n_mice);
+r_tail_from_video_pels=zeros(2,n_voc,n_mice);
 
 % iterate over the vocalizations
 for i=1:n_voc
@@ -62,25 +62,25 @@ for i=1:n_voc
   if is_x_head_style
     pos=voc_index(i).pos_data;
     for j=1:n_mice
-      r_head_pels(:,i,j)=[pos(j).x_head ...
+      r_head_from_video_pels(:,i,j)=[pos(j).x_head ...
                           pos(j).y_head]';  % pels
-      r_tail_pels(:,i,j)=[pos(j).x_tail ...
+      r_tail_from_video_pels(:,i,j)=[pos(j).x_tail ...
                           pos(j).y_tail]';  % pels
     end
   elseif are_positions_from_motr
     pos=pos_index(i);
     for j=1:n_mice
-      r_head_pels(:,i,j)=[pos.pos_data_nose_x(j) ...
+      r_head_from_video_pels(:,i,j)=[pos.pos_data_nose_x(j) ...
                           pos.pos_data_nose_y(j)]';  % pels
-      r_tail_pels(:,i,j)=[pos.pos_data_tail_x(j) ...
+      r_tail_from_video_pels(:,i,j)=[pos.pos_data_tail_x(j) ...
                           pos.pos_data_tail_y(j)]';  % pels
     end    
   else  % positions are in the voc file, and are named {nose/tail}_{x/y}
     pos=voc_index(i).pos_data;
     for j=1:n_mice
-      r_head_pels(:,i,j)=[pos(j).nose_x ...
+      r_head_from_video_pels(:,i,j)=[pos(j).nose_x ...
                           pos(j).nose_y]';  % pels
-      r_tail_pels(:,i,j)=[pos(j).tail_x ...
+      r_tail_from_video_pels(:,i,j)=[pos(j).tail_x ...
                           pos(j).tail_y]';  % pels
     end
   end
@@ -91,10 +91,10 @@ end
 % locations.  The "head" position is actually the position of a point
 % half-way from the center to the head.  Similarly for the tail.  So we'll
 % correct them here.
-r_center_pels=(r_head_pels+r_tail_pels)/2;
-dr_head_pels=2*(r_head_pels-r_center_pels);
-r_head_pels=r_center_pels+dr_head_pels;
-r_tail_pels=r_center_pels-dr_head_pels;
+r_center_pels=(r_head_from_video_pels+r_tail_from_video_pels)/2;
+dr_head_pels=2*(r_head_from_video_pels-r_center_pels);
+r_head_from_video_pels=r_center_pels+dr_head_pels;
+r_tail_from_video_pels=r_center_pels-dr_head_pels;
 
 
 
