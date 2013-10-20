@@ -84,7 +84,7 @@ if true ,
   in_cage=trial_overhead.in_cage;
   fs=trial_overhead.fs;
   clear trial_overhead;
-  save(cache_file_name);
+  %save(cache_file_name);
 else
   load(cache_file_name);
 end
