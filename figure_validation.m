@@ -1,5 +1,5 @@
 % load pre-calculated stuff
-load('r_est_raw_for_single_mouse_data_snippetized.mat');
+load('r_est_for_single_mouse_data_snippetized.mat');
 
 % Unpack the blob, and flatten across trials
 [date_str, ...

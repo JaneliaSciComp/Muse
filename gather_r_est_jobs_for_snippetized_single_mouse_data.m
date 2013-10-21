@@ -41,6 +41,6 @@ for i_trial=1:n_trials ,
 end
 
 % save everything           
-save('r_est_raw_for_single_mouse_data_snippetized.mat', ...
+save('r_est_for_single_mouse_data_snippetized.mat', ...
      'r_est_blob_per_segment_per_trial');
 

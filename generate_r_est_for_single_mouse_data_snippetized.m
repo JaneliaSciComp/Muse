@@ -1,3 +1,6 @@
+% N.B.: You probably shouldn't use this except for testing.  Use
+% something that starts with scatter_ so you can run it on the cluster.
+
 % calculate stuff for all vocalizations
 options.verbosity=0;  % how much output or intermediate results the user wants to 
                       % see
@@ -49,5 +52,5 @@ r_est_blob_per_segment_per_trial= ...
 toc
 
 % save everything           
-save('r_est_raw_for_single_mouse_data_snippetized.mat');
+save('r_est_for_single_mouse_data_snippetized.mat');
 
