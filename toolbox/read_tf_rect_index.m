@@ -1,21 +1,27 @@
-function [syl_name,i_start,i_end,f_lo,f_hi,r_head_from_video_pels,r_tail_from_video_pels]= ...
-  read_voc_index(voc_index_file_name)
+function [tf_rect_name,i_start,i_end,f_lo,f_hi,r_head_from_video_pels,r_tail_from_video_pels]= ...
+  read_tf_rect_index(tf_rect_index_file_name)
 
 % load the index
-s=load(voc_index_file_name);
-voc_index=s.mouse;
+s=load(tf_rect_index_file_name);
+tf_rect_index=s.mouse;
 clear s;
 
 % first things first
-n_voc=length(voc_index);
+n_tf_rect=length(tf_rect_index);
+
+% % check that there are no tf_rects with fewer than 12 hot pels
+% % these should have been filtered out by Josh
+% if sum([tf_rect_index.hot_pix]<12)>0 ,
+%   error('A least one tf_rect has fewer than 12 hot pixels.');
+% end
 
 % figure out what form the video position data is in
 is_x_head_style=false;
 are_positions_from_motr=false;
-if isfield(voc_index,'pos_data')
+if isfield(tf_rect_index,'pos_data')
   % this is how the older files store the position data (pre April 2013)
-  if n_voc>=1
-    pos=voc_index(1).pos_data;
+  if n_tf_rect>=1
+    pos=tf_rect_index(1).pos_data;
     n_mice=length(pos);
     if n_mice>0
       is_x_head_style=isfield(pos(1),'x_head');
@@ -23,12 +29,12 @@ if isfield(voc_index,'pos_data')
   end
 else
   % newer files (post April 2013) store the position data in a separate file
-  [voc_index_dir_name,voc_index_base_name,voc_index_extension]=fileparts(voc_index_file_name);
-  pos_index_file_name=fullfile(voc_index_dir_name,[voc_index_base_name '_Position' voc_index_extension]);
+  [tf_rect_index_dir_name,tf_rect_index_base_name,tf_rect_index_extension]=fileparts(tf_rect_index_file_name);
+  pos_index_file_name=fullfile(tf_rect_index_dir_name,[tf_rect_index_base_name '_Position' tf_rect_index_extension]);
   s=load(pos_index_file_name);
   pos_index=s.mouse_position;
   are_positions_from_motr=true;
-  if n_voc>=1
+  if n_tf_rect>=1
     pos=pos_index(1);
     n_mice=length(pos.pos_data_nose_x);
   else
@@ -37,30 +43,30 @@ else
 end
 
 % prep the arrays
-syl_name=cell(n_voc,1);
-i_start=zeros(n_voc,1);
-i_end=zeros(n_voc,1);
-f_lo=zeros(n_voc,1);
-f_hi=zeros(n_voc,1);
-r_head_from_video_pels=zeros(2,n_voc,n_mice);
-r_tail_from_video_pels=zeros(2,n_voc,n_mice);
+tf_rect_name=cell(n_tf_rect,1);
+i_start=zeros(n_tf_rect,1);
+i_end=zeros(n_tf_rect,1);
+f_lo=zeros(n_tf_rect,1);
+f_hi=zeros(n_tf_rect,1);
+r_head_from_video_pels=zeros(2,n_tf_rect,n_mice);
+r_tail_from_video_pels=zeros(2,n_tf_rect,n_mice);
 
-% iterate over the vocalizations
-for i=1:n_voc
-  % read in the syllable name
-  syl_name{i}=voc_index(i).syl_name;
+% iterate over the t-f rects
+for i=1:n_tf_rect
+  % read in the "syllable" name, a.k.a. the t-f rect name
+  tf_rect_name{i}=tf_rect_index(i).syl_name;
 
   % read the start, end index
-  i_start(i)=floor(voc_index(i).start_sample_fine);
-  i_end(i)=ceil(voc_index(i).stop_sample_fine);
+  i_start(i)=floor(tf_rect_index(i).start_sample_fine);
+  i_end(i)=ceil(tf_rect_index(i).stop_sample_fine);
 
-  % read the band where the vocalization is
-  f_lo(i) = voc_index(i).lf_fine;  % Hz
-  f_hi(i) = voc_index(i).hf_fine;
+  % read the band where the t-f rect is
+  f_lo(i) = tf_rect_index(i).lf_fine;  % Hz
+  f_hi(i) = tf_rect_index(i).hf_fine;
 
   % get head & tail positions, in pels
   if is_x_head_style
-    pos=voc_index(i).pos_data;
+    pos=tf_rect_index(i).pos_data;
     for j=1:n_mice
       r_head_from_video_pels(:,i,j)=[pos(j).x_head ...
                           pos(j).y_head]';  % pels
@@ -75,8 +81,8 @@ for i=1:n_voc
       r_tail_from_video_pels(:,i,j)=[pos.pos_data_tail_x(j) ...
                           pos.pos_data_tail_y(j)]';  % pels
     end    
-  else  % positions are in the voc file, and are named {nose/tail}_{x/y}
-    pos=voc_index(i).pos_data;
+  else  % positions are in the tf_rect file, and are named {nose/tail}_{x/y}
+    pos=tf_rect_index(i).pos_data;
     for j=1:n_mice
       r_head_from_video_pels(:,i,j)=[pos(j).nose_x ...
                           pos(j).nose_y]';  % pels
