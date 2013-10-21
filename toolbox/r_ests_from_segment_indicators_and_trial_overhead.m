@@ -25,7 +25,7 @@ end
 % y_grid=trial_overhead.y_grid;
 % in_cage=trial_overhead.in_cage;
 
-% filter out the snippets (i.e. syls) that don't match i_segment
+% filter out the snippets that don't match i_segment
 if ~isempty(tf_rect_name) ,
   tf_rect_name_first=tf_rect_name{1};
   if length(tf_rect_name_first)~=17 ,

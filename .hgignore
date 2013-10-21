@@ -11,3 +11,11 @@ toolbox/tmt_rel_*
 *.pdf
 *.tcs
 posterior.txt
+job_inputs_*/*
+job_outputs_*/*
+job_stderrs_*/*
+job_stdouts_*/*
+bin/feval_analysis_function_executable
+bin/mccExcludedFiles.log
+bin/readme.txt
+bin/run_feval_analysis_function_executable.sh

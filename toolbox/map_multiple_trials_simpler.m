@@ -23,13 +23,7 @@ for i_trial=1:n_trials
                                 data_analysis_dir_name, ...
                                 date_str{i_trial}, ...
                                 letter_str{i_trial});
-  
-  % figure out which t-f rectangles go with which segments
-  [i_first_tf_rect_in_segment,i_last_tf_rect_in_segment]= ...
-    determine_segments(overhead_this_trial.tf_rect_name);
-  overhead_this_trial.i_first_tf_rect_in_segment=i_first_tf_rect_in_segment;
-  overhead_this_trial.i_last_tf_rect_in_segment=i_last_tf_rect_in_segment; 
-                              
+                                
   % iterate over the vocalizations in this trial
   n_segments_this_trial=length(i_first_tf_rect_in_segment);
   n_segments_total=n_segments_total+n_segments_this_trial;
