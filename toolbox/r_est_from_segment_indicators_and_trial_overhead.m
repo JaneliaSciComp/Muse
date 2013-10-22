@@ -9,16 +9,20 @@ r_est_blobs = ...
   r_ests_from_segment_indicators_and_trial_overhead(args,options);
 
 % unpack the return blob
+n_snippets=length(r_est_blobs);
 field_names=fieldnames(r_est_blobs);
 for i=1:length(field_names)
   eval(sprintf('%s_all_snippets={r_est_blobs.%s}'';',field_names{i},field_names{i}));
 end
-clear r_est_blobs;
+%clear r_est_blobs;
 
 % transform things from cell arrays what can
-n_snippets=length(tf_rect_name_all_snippets);
 if n_snippets<3 ,
-  output=rmfield(args,{'x_grid' 'y_grid' 'in_cage'});
+  %output=rmfield(args,{'x_grid' 'y_grid' 'in_cage'});
+  output=struct();
+  output.date_str=args.date_str;
+  output.letter_str=args.letter_str;
+  output.i_segment=args.i_segment;
   output.localized=false;
   output.r_est=[nan nan]';
   output.Covariance_matrix=[nan nan; nan nan];
@@ -55,7 +59,11 @@ is_outlier=logical(is_outlier);
 n_outliers=sum(is_outlier);
 n_keepers=n_snippets-n_outliers;
 if n_keepers<3 ,
-  output=rmfield(args,{'x_grid' 'y_grid' 'in_cage'});
+  %output=rmfield(args,{'x_grid' 'y_grid' 'in_cage'});
+  output=struct();
+  output.date_str=args.date_str;
+  output.letter_str=args.letter_str;
+  output.i_segment=args.i_segment;
   output.localized=false;
   output.r_est=[nan nan]';
   output.Covariance_matrix=[nan nan; nan nan];
@@ -97,7 +105,11 @@ p_head=mvnpdf(r_head_from_video',r_est',Covariance_matrix);  % density
 P_posterior_head=p_head/sum(p_head);  % posterior probability
 
 % put stuff in the return blob
-output=rmfield(args,{'x_grid' 'y_grid' 'in_cage'});
+%output=rmfield(args,{'x_grid' 'y_grid' 'in_cage'});
+output=struct();
+output.date_str=args.date_str;
+output.letter_str=args.letter_str;
+output.i_segment=args.i_segment;
 output.localized=true;
 output.r_est=r_est;
 output.Covariance_matrix=Covariance_matrix;

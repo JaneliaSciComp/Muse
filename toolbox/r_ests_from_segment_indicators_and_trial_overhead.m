@@ -56,7 +56,7 @@ end
 
 % do the estimation for each snippet
 n_snippets=length(tf_rect_name_keep);
-r_est_blobs=struct();
+r_est_blobs=struct([]);
 for i_snippet=1:n_snippets ,
   % pack up all the arguments
   %snippet_args=args_template_and_overhead;
@@ -88,5 +88,9 @@ for i_snippet=1:n_snippets ,
     r_est_blobs(i_snippet)=r_est_blob_this;
   end
 end
+
+% if isempty(r_est_blobs) || isempty(fieldnames(r_est_blobs)) ,
+%   error('r_est_blobs is messed up');
+% end
 
 end

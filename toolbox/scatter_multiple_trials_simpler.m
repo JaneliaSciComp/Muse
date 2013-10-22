@@ -24,11 +24,12 @@ mcr_path=fileparts(fileparts(matlab_file_name_abs));
 
 n_trials=length(date_str);
 %blob_per_segment_per_trial=cell(n_trials,1);
+n_segments_submitted_total=0;
 for i_trial=1:n_trials
   i_trial  %#ok
   date_str_this_trial=date_str{i_trial};
   letter_str_this_trial=letter_str{i_trial};
-  n_segments_so_far_this_trial=0;
+  %n_segments_so_far_this_trial=0;
   
   job_inputs_dir_name =fullfile(project_dir_path,sprintf('job_inputs_%s_%s' ,date_str_this_trial,letter_str_this_trial));
   job_outputs_dir_name=fullfile(project_dir_path,sprintf('job_outputs_%s_%s',date_str_this_trial,letter_str_this_trial));
@@ -50,12 +51,13 @@ for i_trial=1:n_trials
   for i_job_this_trial=1:n_jobs_this_trial
     i_segment_this_job_first=(i_job_this_trial-1)*n_segments_per_job_max+1;
     if (i_job_this_trial<n_jobs_this_trial)
-      i_segment_this_job_last=(i_job_this_trial-1)*n_segments_per_job_max+n_segments_per_job_max
+      i_segment_this_job_last=(i_job_this_trial-1)*n_segments_per_job_max+n_segments_per_job_max;  
     else
-      i_segment_this_job_last=n_segments_to_process_this_trial
+      i_segment_this_job_last=n_segments_to_process_this_trial;
     end
     n_segments_this_job=i_segment_this_job_last-i_segment_this_job_first+1;
     i_segment_this_job_first  %#ok
+    i_segment_this_job_last  %#ok
     %args=repmat(args_template,[n_segments_this_job 1]);
     %argses=struct([]);
         
@@ -100,14 +102,14 @@ for i_trial=1:n_trials
         feval_analysis_function_executable(output_file_name,input_file_name);
       end
     end
+    n_segments_submitted_total=n_segments_submitted_total+n_segments_this_job;
     
-    n_segments_so_far_this_trial=n_segments_so_far_this_trial+1;
-    if n_segments_so_far_this_trial>=n_segments_per_trial_max
-      break
-    end
-  end
+    %n_segments_so_far_this_trial=n_segments_so_far_this_trial+n_segments_this_job;
+  end  % loop over jobs
   toc
   % blob_per_segment_per_trial{i_trial}=blob_per_segment;
-end
+end  % loop over trials
+
+n_segments_submitted_total  %#ok
 
 end
