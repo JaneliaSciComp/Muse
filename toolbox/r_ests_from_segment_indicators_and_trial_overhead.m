@@ -2,7 +2,7 @@ function r_est_blobs= ...
   r_ests_from_segment_indicators_and_trial_overhead(args,options)
 
 % Estimates position for all snippets in the given segment, and returns the
-% per-snippet estimates
+% per-snippet estimates.
 
 % unpack all the args
 field_names=fieldnames(args);
@@ -29,7 +29,7 @@ end
 if ~isempty(tf_rect_name) ,
   tf_rect_name_first=tf_rect_name{1};
   if length(tf_rect_name_first)~=17 ,
-    error('The "syllable" "names" appear to be in the wrong format.');
+    error('The t-f rect names appear to be in the wrong format.');
   end
   i_segment_all_as_string=cellfun(@(s)s(4:9),tf_rect_name,'UniformOutput',false);
   i_segment_all=str2double(i_segment_all_as_string);

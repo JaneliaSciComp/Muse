@@ -4,7 +4,7 @@ function output= ...
 % Estimates position for all snippets in the given segment, gets rid of
 % outliers, and returns the overall position estimate for the segment.
 
-% call the functions
+% call the position estimator on all snippets
 r_est_blobs = ...
   r_ests_from_segment_indicators_and_trial_overhead(args,options);
 
