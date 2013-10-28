@@ -7,9 +7,29 @@ function output= ...
 % call the position estimator on all snippets
 r_est_blobs = ...
   r_ests_from_segment_indicators_and_trial_overhead(args,options);
+n_snippets=length(r_est_blobs);
+
+% check for emptyness
+if n_snippets==0 ,
+  output=struct();
+  output.date_str=args.date_str;
+  output.letter_str=args.letter_str;
+  output.i_segment=args.i_segment;
+  output.localized=false;
+  output.r_est=[nan nan]';
+  output.Covariance_matrix=[nan nan; nan nan];
+  n_mice=size(args.r_head_from_video,3);
+  output.p_head=nan(n_mice,1);
+  output.P_posterior_head=nan(n_mice,1);
+  output.r_head_from_video=nan(2,1);
+  output.r_tail_from_video=nan(2,1);
+  if options.return_big_things ,
+    output.rsrp_grid=nan;
+  end
+  return  
+end
 
 % unpack the return blob
-n_snippets=length(r_est_blobs);
 field_names=fieldnames(r_est_blobs);
 for i=1:length(field_names)
   eval(sprintf('%s_all_snippets={r_est_blobs.%s}'';',field_names{i},field_names{i}));
@@ -17,7 +37,22 @@ end
 %clear r_est_blobs;
 
 % transform things from cell arrays what can
-if n_snippets<3 ,
+if options.return_big_things ,
+  rsrp_grid_all_snippets=cell2mat(reshape(rsrp_grid_all_snippets,[1 1 n_snippets]));
+end
+%rsrp_per_pair_grid_all_snippets=cell2mat(reshape(rsrp_per_pair_grid_all_snippets,[1 1 1 n_snippets]));
+r_est_all_snippets=cell2mat(reshape(r_est_all_snippets,[1 n_snippets]));
+r_head_from_video_all_snippets=cell2mat(reshape(r_head_from_video_all_snippets,[1 n_snippets]));
+r_tail_from_video_all_snippets=cell2mat(reshape(r_tail_from_video_all_snippets,[1 n_snippets]));
+
+% Because of grid sampling, it is possible for the r_ests to be exactly
+% equal to one another, and thus for there to be >=3 snippets, but <3
+% unique snippets, which will make kur_rce() throw an error.
+r_est_all_snippets_unique=unique(r_est_all_snippets','rows')';
+n_snippets_unique=size(r_est_all_snippets_unique,2);
+
+% if fewer than 3 unique snippets, can't localize
+if n_snippets_unique<3 ,
   %output=rmfield(args,{'x_grid' 'y_grid' 'in_cage'});
   output=struct();
   output.date_str=args.date_str;
@@ -36,22 +71,6 @@ if n_snippets<3 ,
   end
   return
 end
-if options.return_big_things ,
-  rsrp_grid_all_snippets=cell2mat(reshape(rsrp_grid_all_snippets,[1 1 n_snippets]));
-end
-%rsrp_per_pair_grid_all_snippets=cell2mat(reshape(rsrp_per_pair_grid_all_snippets,[1 1 1 n_snippets]));
-r_est_all_snippets=cell2mat(reshape(r_est_all_snippets,[1 n_snippets]));
-r_head_from_video_all_snippets=cell2mat(reshape(r_head_from_video_all_snippets,[1 n_snippets]));
-r_tail_from_video_all_snippets=cell2mat(reshape(r_tail_from_video_all_snippets,[1 n_snippets]));
-
-% % unpack the trial overhead
-% R=trial_overhead.R;
-% Temp=trial_overhead.Temp;
-% dx=trial_overhead.dx;
-% x_grid=trial_overhead.x_grid;
-% y_grid=trial_overhead.y_grid;
-% in_cage=trial_overhead.in_cage;
-% fs=trial_overhead.fs;
 
 % need to do outlier filtering on r_est here
 [is_outlier,~,r_est_trans,Covariance_matrix] = kur_rce(r_est_all_snippets',1);

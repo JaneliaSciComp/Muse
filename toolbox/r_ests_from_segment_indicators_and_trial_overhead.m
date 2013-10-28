@@ -26,22 +26,21 @@ end
 % in_cage=trial_overhead.in_cage;
 
 % filter out the snippets that don't match i_segment
-if ~isempty(tf_rect_name) ,
-  tf_rect_name_first=tf_rect_name{1};
-  if length(tf_rect_name_first)~=17 ,
-    error('The t-f rect names appear to be in the wrong format.');
-  end
-  i_segment_all_as_string=cellfun(@(s)s(4:9),tf_rect_name,'UniformOutput',false);
-  i_segment_all=str2double(i_segment_all_as_string);
-  keep=(i_segment_all==i_segment);
-  tf_rect_name_keep=tf_rect_name(keep);
-  i_start_keep=i_start(keep);
-  i_end_keep=i_end(keep);
-  f_lo_keep=f_lo(keep);
-  f_hi_keep=f_hi(keep);
-  r_head_from_video_keep=r_head_from_video(:,keep,:);
-  r_tail_from_video_keep=r_tail_from_video(:,keep,:);    
+n_snippets_in_trial=length(tf_rect_name);
+keep=false(n_snippets_in_trial,1);
+if isnan(i_first_tf_rect_in_segment(i_segment)) ,
+  % means this segment has zero snippets, so keep should be all-false
+else
+  keep(i_first_tf_rect_in_segment(i_segment):i_last_tf_rect_in_segment(i_segment))=true;
 end
+%keep=(i_segment_all==i_segment);
+tf_rect_name_keep=tf_rect_name(keep);
+i_start_keep=i_start(keep);
+i_end_keep=i_end(keep);
+f_lo_keep=f_lo(keep);
+f_hi_keep=f_hi(keep);
+r_head_from_video_keep=r_head_from_video(:,keep,:);
+r_tail_from_video_keep=r_tail_from_video(:,keep,:);    
 
 % % package up all the trial overhead for return
 % overhead.R=R;

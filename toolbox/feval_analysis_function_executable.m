@@ -6,10 +6,10 @@ function feval_analysis_function_executable(output_file_name,input_file_name)
 
 load(input_file_name);
 if ~exist(output_file_name,'file')         
+%if true ,  
   blobs = ...
     feval(analysis_function, ...
           args,options);  %#ok
-  % save(output_file_name,'r_est','dssen_head');
   save(output_file_name,'blobs','args','options');
 end
 

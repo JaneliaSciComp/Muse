@@ -86,6 +86,7 @@ for i_trial=1:n_trials
       fullfile(job_outputs_dir_name, ...
                sprintf('output_%s_%s_first_segment_%04d.mat',date_str_this_trial,letter_str_this_trial,i_segment_this_job_first));
     if ~exist(output_file_name,'file') ,
+    %if true ,  
       save(input_file_name,'analysis_function','args','options');
       if use_cluster ,                   
         qsub_str=sprintf('qsub -l short=true -A egnorr -b yes -e "%s" -o "%s" "%s" "%s" "%s" "%s"', ...

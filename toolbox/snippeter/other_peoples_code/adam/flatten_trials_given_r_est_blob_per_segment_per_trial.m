@@ -27,6 +27,11 @@ n_trials=length(r_est_blob_per_segment_per_trial);
 for i_trial_this=1:n_trials
   n_segments_this_trial=length(r_est_blob_per_segment_per_trial{i_trial_this});
 
+  fprintf('%s_%s: %d segments\n', ...
+          r_est_blob_per_segment_per_trial{i_trial_this}(1).date_str, ...
+          r_est_blob_per_segment_per_trial{i_trial_this}(1).letter_str, ...
+          n_segments_this_trial);
+
   date_str_flat_this={r_est_blob_per_segment_per_trial{i_trial_this}.date_str}';
   date_str_flat= ...
     [date_str_flat;date_str_flat_this];  %#ok
@@ -34,6 +39,7 @@ for i_trial_this=1:n_trials
   letter_str_flat_this={r_est_blob_per_segment_per_trial{i_trial_this}.letter_str}';
   letter_str_flat= ...
     [letter_str_flat;letter_str_flat_this];  %#ok
+  
   
   i_trial=[i_trial ; ...
            repmat(i_trial_this,[n_segments_this_trial 1])];  %#ok
