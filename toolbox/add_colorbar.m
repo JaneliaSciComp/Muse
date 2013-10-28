@@ -5,6 +5,15 @@ function axes_cb_h=add_colorbar(axes_h, ...
 % Adds a colorbar to the right of axes_h, without moving or changing 
 % axes_h in any way.  Still uses the figure colormap.
 
+if ~exist('w_cb','var') || isempty(w_cb)
+  w_cb=20/72;  % in
+end
+
+if ~exist('w_spacer','var') || isempty(w_spacer)
+  w_spacer=15/72;  % in
+  %w_spacer=0;  % in  
+end
+
 % get figure handle
 fig_h=get(axes_h,'parent');
                               
@@ -24,16 +33,9 @@ y_main=pos_main(2);
 w_main=pos_main(3);
 h_main=pos_main(4);
 
-if isempty(w_spacer)
-  w_spacer=15/72;  % in
-end
-
 x_cb=x_main+w_main+w_spacer;
 %x_cb=x_main+w_main;
 y_cb=y_main;
-if isempty(w_cb)
-  w_cb=20/72;  % in
-end
 % w_cb is a param
 h_cb=h_main;
 pos_cb=[x_cb y_cb w_cb h_cb];

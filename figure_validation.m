@@ -134,6 +134,7 @@ counts_max=max(max(dr_est_rot_counts))  %#ok
 %cmap=flipud(bspectrumw_smooth(256));
 %cmap=yb;
 cmap=flipud(spindle_smooth(256));
+%cmap=jet(256);
 
 %cmap(1,:)=[0.5 0.5 0.5];  % make count of one map to red
 %cmap(1,:)=[1 0 0];  % make count of one map to red

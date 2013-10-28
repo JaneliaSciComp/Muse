@@ -26,10 +26,11 @@ fig_h=get(axes_h,'parent');
 %figure(fig_h);
 set(axes_h,'box','on', ...
            'layer','top', ...
-           'ydir','reverse', ...
-           'dataaspectratio',[1 1 1]);
+           'ydir','reverse');
+%           'dataaspectratio',[1 1 1]);
 set(axes_h,'xlim',1e2*xl, ...
            'ylim',1e2*yl);
+change_axes_position_manually_to_give_one_one_data_aspect_ratio(axes_h);
 if ~isempty(cl)
   set(axes_h,'clim',cl);
 end

@@ -11,8 +11,8 @@ options.return_big_things=true;  % return the full map and other large
                                  % data structures
 
 cache_file_name='methods_figure_1_rsrp_maps_and_estimate_panels_cache.mat';
-%if ~exist(cache_file_name,'file') ,
-if true ,
+if ~exist(cache_file_name,'file') ,
+%if true ,
   % identifying info for the segment
   date_str='06132012';
   letter_str='D';
@@ -84,7 +84,7 @@ if true ,
   in_cage=trial_overhead.in_cage;
   fs=trial_overhead.fs;
   clear trial_overhead;
-  %save(cache_file_name);
+  save(cache_file_name);
 else
   load(cache_file_name);
 end

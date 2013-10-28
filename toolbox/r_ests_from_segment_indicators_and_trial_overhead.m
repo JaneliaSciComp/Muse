@@ -9,7 +9,7 @@ field_names=fieldnames(args);
 for i=1:length(field_names) ,
   eval(sprintf('%s=args.%s;',field_names{i},field_names{i}));
 end
-                              
+
 % % unpack the contents of trial_overhead
 % tf_rect_name_all=trial_overhead.tf_rect_name;
 % i_start_all=trial_overhead.i_start;
@@ -39,8 +39,8 @@ i_start_keep=i_start(keep);
 i_end_keep=i_end(keep);
 f_lo_keep=f_lo(keep);
 f_hi_keep=f_hi(keep);
-r_head_from_video_keep=r_head_from_video(:,keep,:);
-r_tail_from_video_keep=r_tail_from_video(:,keep,:);    
+r_head_from_video_keep=r_head_from_video(:,keep,:);  %#ok
+r_tail_from_video_keep=r_tail_from_video(:,keep,:);  %#ok  
 
 % % package up all the trial overhead for return
 % overhead.R=R;
@@ -56,6 +56,9 @@ r_tail_from_video_keep=r_tail_from_video(:,keep,:);
 % do the estimation for each snippet
 n_snippets=length(tf_rect_name_keep);
 r_est_blobs=struct([]);
+if isfield(options,'verbosity') ,
+  options.verbosity=options.verbosity-1;
+end
 for i_snippet=1:n_snippets ,
   % pack up all the arguments
   %snippet_args=args_template_and_overhead;
