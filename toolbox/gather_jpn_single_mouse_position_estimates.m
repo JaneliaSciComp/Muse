@@ -66,37 +66,19 @@ for i_trial = 1:n_trials ,
       r_head_from_video_per_snippet_this_segment= ...
         r_head_from_video_per_snippet(:,i_first_snippet_this_segment:i_last_snippet_this_segment);
       r_tail_from_video_per_snippet_this_segment= ...
-        r_tail_from_video_per_snippet(:,i_first_snippet_this_segment:i_last_snippet_this_segment);
-      
-%       % take the mean of the filtered snippet position locations
-%       r_head_from_video_this(:,i_segment)=mean(r_head_from_video_per_snippet_this_segment,2);
-%       r_tail_from_video_this(:,i_segment)=mean(r_tail_from_video_per_snippet_this_segment,2);
-
-      % We want to get a head and tail position for each segment.  To do
-      % this, we get the head and tail position for each snippet, but then
-      % filter so that we only get one position per time window (there can
-      % be several snippets per time window).  We then average the
-      % per-snippet position estimates across the filtered snippets
+        r_tail_from_video_per_snippet(:,i_first_snippet_this_segment:i_last_snippet_this_segment);     
       
       % Get the first and last audio sample index for each snippet
       i_first_sample_per_snippet_this_segment=i_start_per_snippet(i_first_snippet_this_segment:i_last_snippet_this_segment);
       i_last_sample_per_snippet_this_segment=i_end_per_snippet(i_first_snippet_this_segment:i_last_snippet_this_segment);
-      i_sample_bounds_per_snippet_this_segment=[i_first_sample_per_snippet_this_segment ...
-                                               i_last_sample_per_snippet_this_segment ];
-                                             
-      % For each time window, get the index of one snippet
-      [~,i_snippet_this_segment_one_per_time_window] = ...   
-        unique(i_sample_bounds_per_snippet_this_segment,'rows');
-      
-      % filter, keeping one snippet per time-window
-      r_head_from_video_per_snippet_this_segment_one_per_time_window= ...
-        r_head_from_video_per_snippet_this_segment(:,i_snippet_this_segment_one_per_time_window);
-      r_tail_from_video_per_snippet_this_segment_one_per_time_window= ...
-        r_tail_from_video_per_snippet_this_segment(:,i_snippet_this_segment_one_per_time_window);
-      
-      % take the mean of the filtered snippet position locations
-      r_head_from_video_this(:,i_segment)=mean(r_head_from_video_per_snippet_this_segment_one_per_time_window,2);
-      r_tail_from_video_this(:,i_segment)=mean(r_tail_from_video_per_snippet_this_segment_one_per_time_window,2);
+
+      % Summarize the positions across segments, taking care not to double
+      % count snippets that correspond to the same time window
+      [r_head_from_video_this(:,i_segment),r_tail_from_video_this(:,i_segment)]= ...
+        r_head_for_segment_from_snippets(r_head_from_video_per_snippet_this_segment, ...
+                                         r_tail_from_video_per_snippet_this_segment, ...
+                                         i_first_sample_per_snippet_this_segment, ...
+                                         i_last_sample_per_snippet_this_segment);
     end
   end
   

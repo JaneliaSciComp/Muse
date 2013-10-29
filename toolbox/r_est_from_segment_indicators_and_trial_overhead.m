@@ -51,8 +51,15 @@ end
 r_est_all_snippets=cell2mat(reshape(r_est_all_snippets,[1 n_snippets]));  %#ok
 r_head_from_video_all_snippets=cell2mat(reshape(r_head_from_video_all_snippets,[1 n_snippets]));  %#ok
 r_tail_from_video_all_snippets=cell2mat(reshape(r_tail_from_video_all_snippets,[1 n_snippets]));  %#ok
-r_head_from_video=mean(r_head_from_video_all_snippets,2);
-r_tail_from_video=mean(r_tail_from_video_all_snippets,2);
+
+% Get the video position from the snippets
+i_start_all_snippets=cell2mat(i_start_all_snippets);
+i_end_all_snippets=cell2mat(i_end_all_snippets);
+[r_head_from_video,r_tail_from_video]= ...
+  r_head_for_segment_from_snippets(r_head_from_video_all_snippets, ...
+                                   r_tail_from_video_all_snippets, ...
+                                   i_start_all_snippets, ...
+                                   i_end_all_snippets);                                 
 
 % Because of grid sampling, it is possible for the r_ests to be exactly
 % equal to one another, and thus for there to be >=3 snippets, but <3

@@ -302,8 +302,17 @@ r_est_all_outliers=r_est_all_snippets(:,is_outlier);
 % take the mean of the maps for all the non-outliers
 rsrp_grid=mean(rsrp_grid_all_keepers,3);
 rsrp_abs_max=max(max(abs(rsrp_grid)));
-r_head_from_video=mean(r_head_from_video_all_snippets,2);
-r_tail_from_video=mean(r_tail_from_video_all_snippets,2);
+
+% Get the video position from the snippets
+i_start_all_snippets=cell2mat(i_start_all_snippets);
+i_end_all_snippets=cell2mat(i_end_all_snippets);
+[r_head_from_video,r_tail_from_video]= ...
+  r_head_for_segment_from_snippets(r_head_from_video_all_snippets, ...
+                                   r_tail_from_video_all_snippets, ...
+                                   i_start_all_snippets, ...
+                                   i_end_all_snippets);                                 
+% r_head_from_video=mean(r_head_from_video_all_snippets,2);
+% r_tail_from_video=mean(r_tail_from_video_all_snippets,2);
 
 % make up some mouse locations
 n_fake_mice=3;
