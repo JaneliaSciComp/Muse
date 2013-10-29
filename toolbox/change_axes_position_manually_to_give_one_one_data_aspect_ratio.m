@@ -37,7 +37,7 @@ elseif axes_aspect_ratio>limits_aspect_ratio ,
 else
   % axes_aspect_ratio<limits_aspect_ratio
   w_new=w;
-  h=w/limits_aspect_ratio;
+  h_new=w/limits_aspect_ratio;
   y_new=y+(h-h_new)/2;
   x_new=x;
 end

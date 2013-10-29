@@ -58,9 +58,9 @@ alt_localized_by_alt_only=alt(is_localized_by_alt_only);
 % end
 
 % look at the ones localized by ALT only
-%i_different_shuffled=randperm(n_localized_by_jpn_only);
+i_localized_by_alt_only_shuffled=randperm(n_localized_by_alt_only);
 for j=1:n_localized_by_alt_only
-  i=j
+  i=i_localized_by_alt_only_shuffled(j);
   results= ...
     r_est_from_segment_indicators(base_dir_name, ...
                                   data_analysis_dir_name, ...

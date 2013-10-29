@@ -21,7 +21,7 @@ data_analysis_dir_name='Data_analysis10';
 
 date_str='06052012';
 letter_str='D';
-i_segment=105;
+i_segment=636;
 
 % run the segment
 results= ...
