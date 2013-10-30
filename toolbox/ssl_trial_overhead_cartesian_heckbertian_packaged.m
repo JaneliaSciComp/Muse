@@ -1,10 +1,10 @@
 function trial_overhead= ...
-  ssl_trial_overhead_cartesian_packaged(base_dir_name,data_analysis_dir_name,date_str,letter_str)
+  ssl_trial_overhead_cartesian_heckbertian_packaged(base_dir_name,data_analysis_dir_name,date_str,letter_str)
 
 % Call the function that sorts all this stuff out                            
 [tf_rect_name,i_start,i_end,f_lo,f_hi,r_head_from_video,r_tail_from_video,R,Temp, ...
  dx,x_grid,y_grid,in_cage,r_corners,fs,i_first_tf_rect_in_segment,i_last_tf_rect_in_segment]= ...
-  ssl_trial_overhead_cartesian(base_dir_name,data_analysis_dir_name,date_str,letter_str);
+  ssl_trial_overhead_cartesian_heckbertian(base_dir_name,data_analysis_dir_name,date_str,letter_str);
 
 % Package it all up in a scalar struct
 trial_overhead.base_dir_name=base_dir_name;

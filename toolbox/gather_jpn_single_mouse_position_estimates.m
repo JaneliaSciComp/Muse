@@ -52,7 +52,7 @@ for i_trial = 1:n_trials ,
   % load the trial overhead data (these stuctures are all per-snippet)
   [~,i_start_per_snippet,i_end_per_snippet,~,~,r_head_from_video_per_snippet,r_tail_from_video_per_snippet,~,~, ...
    ~,~,~,~,~,~,i_first_tf_rect_in_segment_this,i_last_tf_rect_in_segment_this]= ...
-    ssl_trial_overhead_cartesian(base_dir_name,data_analysis_dir_name,date_str_this,letter_str_this);
+    ssl_trial_overhead_cartesian_heckbertian(base_dir_name,data_analysis_dir_name,date_str_this,letter_str_this);
 
   % collect across snippets in a segment
   n_segments_this=length(i_first_tf_rect_in_segment_this);

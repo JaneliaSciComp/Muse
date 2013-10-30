@@ -1,6 +1,6 @@
 function [tf_rect_name,i_start,i_end,f_lo,f_hi,r_head_from_video,r_tail_from_video,R,Temp, ...
           dx,x_grid,y_grid,in_cage,r_corners,fs,i_first_tf_rect_in_segment,i_last_tf_rect_in_segment]= ...
-  ssl_trial_overhead(base_dir_name,data_analysis_dir_name,date_str,letter_str)
+  ssl_trial_overhead_cartesian_heckbertian(base_dir_name,data_analysis_dir_name,date_str,letter_str)
 
 % A "trial" in the sense we use it here is a single video along with
 % the audio and other associated data.
@@ -9,24 +9,23 @@ function [tf_rect_name,i_start,i_end,f_lo,f_hi,r_head_from_video,r_tail_from_vid
 % positions_out.mat file are encoded in a strange way, with the x and y
 % coordinates swapped, but with x and y being in a traditional Cartesian
 % arrangement, with x increasing as you move right and y increasing as you
-% go up in the image frame.  We call this convention "old-style coords"
+% go up in the image frame.  We call this convention "old-style coords".
 
 % Once Josh started using Motr, he switched to not swapping x and y.  (And
 % with y increasing down, b/c that's what Motr does.)  That would be
-% "new-style", which is the default.
-
-% This function was designed assuming that the information in
-% positions_out.mat and Test_?_1_mark_corners.mat is in traditional (y
-% increases going up) Cartesian coords.  But it turns out that it also
-% works fine if the mic and corner coords are in image-style (y increases
-% going down) coords.
+% "new-style".
 
 % In any case, the r_head, r_tail, R, and r_corners output by this function
-% are all in the same coordinate system, which is a Motr-style coordinate
-% system (y increases going down), with the center of the upper-left pixels
-% at meters_per_pixel*(1,1).  To keep the 3D coord system right-handed,
-% that means that a microphone above the plane of the floor will have a
-% negative z coordinate.
+% are all in the same coordinate system, which is a traditional Cartesian
+% coordinate system, (y increases going up), with the lower-left corner of the
+% lower-left pixel at (0,0) in real units.  To keep the 3D coord system
+% right-handed, that means that a microphone above the plane of the floor
+% will have a positive z coordinate.
+
+% Note that doing it this way, rather than the way that is arguably more
+% natural in Matlab, is consistent with the advise set down in "What are
+% the coordinates of a pixel?" by Paul S. Heckbert, and published in one of
+% those Graphics Gems books.
 
 % Also worth noting is that x_grid, y_grid, and in_cage are kind of funky.
 % in_cage(i,j) tells whether <x_grid(i,j),y_grid(i,j)> is in the cage (i.e.
@@ -77,7 +76,7 @@ n_mike=4;
 R=zeros(2,n_mike);  % Mike positions in cols (in meters)
 R(1,:)=[positions_out.x_m];  % m
 R(2,:)=[positions_out.y_m];  % m
-R(3,:)=-[positions_out.z_m];  % m, negative sign makes output coord system right-handed
+R(3,:)=[positions_out.z_m];  % m
 clear positions_out;
 
 are_positions_in_old_style_coords=~isempty(strfind(base_dir_name,'ssl_sys_test'));
@@ -85,22 +84,35 @@ are_positions_in_old_style_coords=~isempty(strfind(base_dir_name,'ssl_sys_test')
   % coords
 
 if are_positions_in_old_style_coords ,
+  R(1:2,:)=flipud(R(1:2,:));  % old-style coords has x and y swapped
+  r_corners=flipud(r_corners);
+  r_head_from_video=flipud(r_head_from_video);
+  r_tail_from_video=flipud(r_tail_from_video);
+else
+  % new-style, aka Motr-style, coords, so we convert to conventional
+  % Cartesian
   video_file_name=fullfile(exp_dir_name, ...
                            sprintf('Test_%s_1.seq',letter_str));
   video_info=fnReadSeqInfo_jpn(video_file_name);
   frame_height_in_pels=video_info.m_iHeight;
-  %frame_height_in_pels=768;  % this is always the case for Josh's videos
-  %frame_height_in_meters=meters_per_pel*frame_height_in_pels;
   y_offset=meters_per_pel*(frame_height_in_pels+1);
-  R(1:2,:)=flipud(R(1:2,:));  % old-style coords has x and y swapped
   R(2,:)=y_offset-R(2,:);
-  r_corners=flipud(r_corners);
   r_corners(2,:)=y_offset-r_corners(2,:);
-  r_head_from_video=flipud(r_head_from_video);
   r_head_from_video(2,:)=y_offset-r_head_from_video(2,:);
-  r_tail_from_video=flipud(r_tail_from_video);
   r_tail_from_video(2,:)=y_offset-r_tail_from_video(2,:);
 end
+
+% At this point, center of the lower-left pixel of the video frame is at
+% meters_per_pixel*(1,1).  Shift everything so that the lower-left corner
+% of the lower-left pixel of the video frame is at (0,0).
+% If the center of the LL pel is at meters_per_pixel*(1,1), that means the
+% LL corner of the LL pel is at 0.5*meters_per_pixel*(1,1), so just
+% subtract this amount from x and y to "move" it to (0,0).
+r_shift=meters_per_pel/2*ones(2,1);
+R=bsxfun(@minus,R,[r_shift;0]);
+r_corners=bsxfun(@minus,r_corners,r_shift);
+r_head_from_video=bsxfun(@minus,r_head_from_video,r_shift);
+r_tail_from_video=bsxfun(@minus,r_tail_from_video,r_shift);
 
 % velocity of sound in air
 Temp = load_anonymous(sprintf('%s/temps.mat',exp_dir_name));  % C

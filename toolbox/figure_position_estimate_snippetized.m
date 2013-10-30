@@ -48,7 +48,8 @@ do_draw_mic_labels=true;
 
 fig_h=figure('color','w');
 %set_figure_size_explicit(fig_h,[w_fig h_fig]);
-axes_h=axes('parent',fig_h,'box','on','ydir','reverse');
+%axes_h=axes('parent',fig_h,'box','on','ydir','reverse');
+axes_h=axes('parent',fig_h,'box','on');
 %set(axes_h,'fontsize',7);
 %set_axes_size_fixed_center_explicit(axes_h,[w_axes h_axes])
 

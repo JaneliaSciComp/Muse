@@ -38,10 +38,11 @@ if ~exist(cache_file_name,'file') ,
   %                          @r_est_from_voc_indicators_and_ancillary_for_a_few_vocs, ...
   %                          args, ...
   %                          verbosity);
-  trial_overhead=ssl_trial_overhead_packaged(base_dir_name,...
-                                             data_analysis_dir_name, ...
-                                             date_str, ...
-                                             letter_str);
+  trial_overhead=...
+    ssl_trial_overhead_cartesian_heckbertian_packaged(base_dir_name,...
+                                                      data_analysis_dir_name, ...
+                                                      date_str, ...
+                                                      letter_str);
 
   % package up the args                                           
   args=trial_overhead;
@@ -326,6 +327,11 @@ r_tail_from_video_fake = ...
    [     0.473832772083876         0.636316477631333         0.556192459384125 ; ...
          0.257019105608912         0.381243714500405         0.658029830339911 ];
 
+% Have to transform these last to convential Cartesian coords
+r_head_from_video_fake(2,:)=(0.67925-r_head_from_video_fake(2,:))+0.0265;
+r_tail_from_video_fake(2,:)=(0.67925-r_tail_from_video_fake(2,:))+0.0265;
+
+       
 % caclulate the density at the real+fake mice, and the posterior
 % probability
 r_head_from_video_real_and_fake=[r_head_from_video r_head_from_video_fake];
@@ -371,7 +377,7 @@ w_colorbar_spacer=0.05;  % in
 
 fig_h=figure('color','w');
 set_figure_size_explicit(fig_h,[w_fig h_fig]);
-axes_h=axes('parent',fig_h,'box','on','ydir','reverse');
+axes_h=axes('parent',fig_h,'box','on');
 set(axes_h,'fontsize',7);
 set_axes_size_fixed_center_explicit(axes_h,[w_axes h_axes])
 
@@ -416,10 +422,10 @@ line('parent',axes_h, ...
 %hold off;
 %set(h_error_ellipse,'color','k');
 %title(axes_h,title_str,'interpreter','none','fontsize',7);
-h=xlabel(axes_h,'');  delete(h);
-h=ylabel(axes_h,'');  delete(h);
-set(axes_h,'ytick',[]);
-set(axes_h,'xtick',[40 60]);
+%h=xlabel(axes_h,'');  delete(h);
+%h=ylabel(axes_h,'');  delete(h);
+%set(axes_h,'ytick',[]);
+%set(axes_h,'xtick',[40 60]);
 
 axes_cb_h=add_colorbar(axes_h,w_colorbar,w_colorbar_spacer);
 set(axes_cb_h,'fontsize',7);

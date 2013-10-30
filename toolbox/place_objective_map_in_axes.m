@@ -25,8 +25,8 @@ yl=[y_grid(1,1) y_grid(1,end)];
 fig_h=get(axes_h,'parent');
 %figure(fig_h);
 set(axes_h,'box','on', ...
-           'layer','top', ...
-           'ydir','reverse');
+           'layer','top');
+%           'ydir','reverse');
 %           'dataaspectratio',[1 1 1]);
 set(axes_h,'xlim',1e2*xl, ...
            'ylim',1e2*yl);
@@ -67,13 +67,13 @@ if do_draw_mic_labels ,
     switch i_mic ,
       case 1,
         x_offset=-offset_mag;  % cm
-        y_offset=-5/4*offset_mag;  % cm
+        y_offset=+5/4*offset_mag;  % cm
       case 2,
         x_offset=+3/4*offset_mag;  % cm
         y_offset=-offset_mag;  % cm
       case 3,
         x_offset=-offset_mag;  % cm
-        y_offset=+offset_mag;  % cm
+        y_offset=-offset_mag;  % cm
       case 4,
         x_offset=-offset_mag;  % cm
         y_offset=-offset_mag;  % cm

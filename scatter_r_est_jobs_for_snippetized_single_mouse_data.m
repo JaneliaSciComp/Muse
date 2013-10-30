@@ -32,6 +32,8 @@ letter_str{end+1}='E';
 n_segments_per_job_max=50;
 n_segments_per_trial_max=inf;  % max number of vocs to do per trial
 use_cluster=true;
+% n_segments_per_trial_max=3;  % max number of vocs to do per trial
+% use_cluster=false;
 
 % directories where to find stuff
 base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
