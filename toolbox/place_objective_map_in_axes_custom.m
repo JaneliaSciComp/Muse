@@ -1,14 +1,14 @@
 function ...
-  place_objective_map_in_axes(axes_h, ...
-                              x_grid,y_grid,objective_grid, ...
-                              color_function, ...
-                              cl, ...
-                              title_str, ...
-                              clr_mike, ...
-                              clr_anno, ...
-                              r_est,r_cr, ...
-                              R,r_head,r_tail, ...
-                              do_draw_mic_labels)
+  place_objective_map_in_axes_custom(axes_h, ...
+                                     x_grid,y_grid,objective_grid, ...
+                                     color_function, ...
+                                     colorbar_limits, ...
+                                     title_str, ...
+                                     clr_mike, ...
+                                     clr_anno, ...
+                                     r_est,r_cr, ...
+                                     R,r_head,r_tail, ...
+                                     do_draw_mic_labels)
 
 %clr_anno=[120 81 169]/255;  % royal purple
 if isempty(clr_anno)
@@ -20,20 +20,21 @@ if ~exist('do_draw_mic_labels','var') || isempty(do_draw_mic_labels) ,
 end
 
 % Determine axis limits
-padding=0.05;  % m  
+padding=0.045;  % m  
 xl=[min(R(1,:))-padding max(R(1,:))+padding];
 yl=[min(R(2,:))-padding max(R(2,:))+padding];
 
 fig_h=get(axes_h,'parent');
 %figure(fig_h);
 set(axes_h,'box','on', ...
+           'visible','off', ...
            'layer','top', ...
            'dataaspectratio',[1 1 1], ...
            'xlim',100*xl, ...
            'ylim',100*yl);
 %change_axes_position_manually_to_give_one_one_data_aspect_ratio(axes_h);
-if ~isempty(cl)
-  set(axes_h,'clim',cl);
+if ~isempty(colorbar_limits)
+  set(axes_h,'clim',colorbar_limits);
 end
 if ~isempty(objective_grid)
   xd=[x_grid(1,1) x_grid(end,1)];
@@ -47,47 +48,54 @@ end
 colormap(fig_h,feval(color_function,256));
 %axis(axes_h,'image');
 %axis(axes_h,'xy');
-xlabel(axes_h,'x (cm)');
-ylabel(axes_h,'y (cm)');
+%xlabel(axes_h,'x (cm)');
+%ylabel(axes_h,'y (cm)');
 title(axes_h,title_str,'interpreter','none')
+set(axes_h,'xtick',[]);
+set(axes_h,'ytick',[]);
 
-n_mike=size(R,2);
-for i=1:n_mike
-  line('parent',axes_h, ...
-       'xdata',100*R(1,i), ...
-       'ydata',100*R(2,i), ...
-       'zdata',0, ...
-       'marker','.', ...
-       'linestyle','none', ...
-       'color',clr_mike(i,:), ...
-       'markersize',18);       
-end
-
-% mic labels
-if do_draw_mic_labels ,
-  offset_mag=4;  % cm                          
-  for i_mic=1:n_mike ,
-    switch i_mic ,
-      case 1,
-        x_offset=-offset_mag;  % cm
-        y_offset=+5/4*offset_mag;  % cm
-      case 2,
-        x_offset=+3/4*offset_mag;  % cm
-        y_offset=-offset_mag;  % cm
-      case 3,
-        x_offset=-offset_mag;  % cm
-        y_offset=-offset_mag;  % cm
-      case 4,
-        x_offset=-offset_mag;  % cm
-        y_offset=-offset_mag;  % cm
-    end
-    text('parent',axes_h, ...
-         'position',[x_offset+100*R(1,i_mic) y_offset+100*R(2,i_mic)], ...
-         'string',sprintf('%d',i_mic), ...
-         'color',clr_mike(i_mic,:), ...
-         'fontsize',7);
+n_mics=size(R,2);
+mic_circle_radius=0.02;  % m
+for i_mic=1:n_mics
+  switch i_mic ,
+    case 1,
+      v=[0;1];
+    case 2,
+      v=[1;0];
+    case 3,
+      v=[0;-1];
+    case 4,
+      v=[-1;0];
   end
+  mic_symbol(axes_h,100*R(1:2,i_mic),v,100*mic_circle_radius, ...
+             sprintf('%d',i_mic));
 end
+
+% % mic labels
+% if do_draw_mic_labels ,
+%   offset_mag=4;  % cm                          
+%   for i_mic=1:n_mics ,
+%     switch i_mic ,
+%       case 1,
+%         x_offset=-offset_mag;  % cm
+%         y_offset=+5/4*offset_mag;  % cm
+%       case 2,
+%         x_offset=+3/4*offset_mag;  % cm
+%         y_offset=-offset_mag;  % cm
+%       case 3,
+%         x_offset=-offset_mag;  % cm
+%         y_offset=-offset_mag;  % cm
+%       case 4,
+%         x_offset=-offset_mag;  % cm
+%         y_offset=-offset_mag;  % cm
+%     end
+%     text('parent',axes_h, ...
+%          'position',[x_offset+100*R(1,i_mic) y_offset+100*R(2,i_mic)], ...
+%          'string',sprintf('%d',i_mic), ...
+%          'color',clr_mike(i_mic,:), ...
+%          'fontsize',7);
+%   end
+% end
 
 n_mice=size(r_head,2);
 z_mice=0;
@@ -160,5 +168,19 @@ if ~isempty(r_cr)
          'color',clr_anno);
   end
 end
+
+% draw scale bar
+x=0.4*R(1,1)+0.6*R(1,4);
+y=R(2,1)-mic_circle_radius;
+line('parent',axes_h, ...
+     'xdata',100*x+[-5 5], ...
+     'ydata',100*y*[1 1], ...
+     'color','k', ...
+     'linewidth',2);
+% text('parent',axes_h, ...
+%      'position',[21 -25], ...
+%      'string','10 cm', ...
+%      'horizontalalignment','center', ...
+%      'fontsize',7);
 
 end

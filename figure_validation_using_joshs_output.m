@@ -23,7 +23,9 @@
  is_localized, ...
  r_est, ...
  r_head, ...
- r_tail] = ...
+ r_tail, ...
+ posterior_chest_with_fake, ...
+ pdf_chest_with_fake] = ...
   gather_jpn_single_mouse_position_estimates();
 
 % Check that all the segments are there
@@ -43,7 +45,9 @@ r_est=r_est(:,is_localized);
 %p_head=p_head(is_localized);
 r_head=r_head(:,is_localized);
 r_tail=r_tail(:,is_localized);
-clear localized
+posterior_chest_with_fake=posterior_chest_with_fake(:,is_localized);
+pdf_chest_with_fake=pdf_chest_with_fake(:,is_localized);
+clear is_localized
 
 % calculate errors
 r_chest=3/4*r_head+1/4*r_tail;
@@ -106,7 +110,7 @@ for k=1:n_segments_localized
 end
 
 % make a 2-d histogram of the estimates in the chest-centered coord system
-dx=0.01;
+dx=0.01;  % m
 dy=dx;
 x_hist_centers_want=(-2:dx:2)';
 y_hist_centers_want=(-1:dy:1)';
@@ -117,7 +121,7 @@ y_hist_edges= ...
 [dr_est_rot_counts,xy_hist_centers_check]=hist3(dr_est_rot','Edges',{x_hist_edges y_hist_edges});
 x_hist_centers=xy_hist_centers_check{1};
 y_hist_centers=xy_hist_centers_check{2};
-dr_est_rot_counts=dr_est_rot_counts(1:end-1,1:end-1);  % stupid extra bins
+dr_est_rot_counts=dr_est_rot_counts(1:end-1,1:end-1);  % stupid extra bins!
 x_hist_centers=x_hist_centers(1:end-1);
 y_hist_centers=y_hist_centers(1:end-1);
 n_x_centers=length(x_hist_centers);
@@ -163,14 +167,15 @@ w_colorbar_spacer=0.06;  % in
 f=figure('color','w','colormap',cmap);
 set_figure_size_explicit(f,[w_fig h_fig]);
 a=axes('parent',f, ...
-       'clim',[0 80], ...
+       'clim',[0 counts_max], ...
        'xlim',[-30 +30], ...
        'ylim',[-30 +30], ...
        'xtick',-50:10:+50, ...
        'ytick',-50:10:+50, ...
+       'dataaspectratio',[1 1 1], ...
        'box','on', ...
        'layer','top');
-change_axes_position_manually_to_give_one_one_data_aspect_ratio(a);     
+%change_axes_position_manually_to_give_one_one_data_aspect_ratio(a);     
 set(a,'fontsize',7);
 set_axes_size_fixed_center_explicit(a,[w_axes h_axes])     
 image('parent',a, ...
@@ -222,70 +227,19 @@ set(gca,'ytick',[]);
 % legend({'Estimate','Mouse tail','Mouse head'},'location','southeast');
 axes_cb_h=add_colorbar(a,w_colorbar,w_colorbar_spacer);
 set(axes_cb_h,'fontsize',7);
-set(axes_cb_h,'ytick',[0 80]);
+set(axes_cb_h,'ytick',[0 counts_max]);
 ylabel(axes_cb_h,'Counts');
 drawnow;
 
 
-
-% %
-% % Generate three random mouse locations for each localized segment, figure 
-% % out what fraction are "assignable", and of those, what fraction are
-% % correct
-% %
-% 
-% % make up some fake mouse locations
-% n_trials=max(i_trial);
-% n_fake_mice=3;
-% r_head_fake=zeros(2,n_fake_mice,0);
-% r_tail_fake=zeros(2,n_fake_mice,0);
-% for i_trial_this=1:n_trials
-%   is_segment_in_this_trial=(i_trial==i_trial_this);
-%   n_segments_this=sum(is_segment_in_this_trial);
-%   r_ht_this=r_head(:,is_segment_in_this_trial)-r_tail(:,is_segment_in_this_trial);
-%   mouse_length_this=hypot(r_ht_this(1,:,:),r_ht_this(2,:,:));
-%   mean_mouse_length_this=mean(mean(mouse_length_this));  
-%   r_corners_this=overhead_per_trial(i_trial).r_corners;
-%   [r_head_fake_this,r_tail_fake_this]= ...
-%     random_mouse_locations(r_corners_this,mean_mouse_length_this,n_fake_mice,n_segments_this);
-%   r_head_fake=cat(3,r_head_fake,r_head_fake_this);
-%   r_tail_fake=cat(3,r_tail_fake,r_tail_fake_this);  
-% end
-% 
-% % combine real and fake mouse locations
-% r_head_with_fake=zeros(2,1+n_fake_mice,n_segments_localized);
-% r_tail_with_fake=zeros(2,1+n_fake_mice,n_segments_localized);
-% r_head_with_fake(:,1,:)=r_head;
-% r_head_with_fake(:,2:end,:)=r_head_fake;
-% r_tail_with_fake(:,1,:)=r_tail;
-% r_tail_with_fake(:,2:end,:)=r_tail_fake;
-% 
-% % calculate chest location for real and fake
-% r_chest_with_fake=3/4*r_head_with_fake+1/4*r_tail_with_fake;
-% 
-% % calculate the density at the real+fake mice, and the posterior
-% % probability
-% r_est_big=repmat(reshape(r_est,[2 1 n_segments_localized]),[1 1+n_fake_mice 1]);
-% Covariance_matrix_big= ...
-%   repmat(reshape(Covariance_matrix,[2 2 1 n_segments_localized]),[1 1 1+n_fake_mice 1]);
-% 
-% r_chest_with_fake_serial= ...
-%   reshape(r_chest_with_fake,[2 (1+n_fake_mice)*n_segments_localized]);
-% r_est_big_serial=reshape(r_est_big,[2 (1+n_fake_mice)*n_segments_localized]);
-% Covariance_matrix_big_serial=reshape(Covariance_matrix_big,[2 2 (1+n_fake_mice)*n_segments_localized]);
-% 
-% p_chest_serial=mvnpdf(r_chest_with_fake_serial',r_est_big_serial',Covariance_matrix_big_serial);  % density, units: 1/(m^2)
-% p_chest=reshape(p_chest_serial,[(1+n_fake_mice) n_segments_localized]);
-% P_posterior_chest= ...
-%   bsxfun(@rdivide,p_chest,sum(p_chest,1));  % posterior probability
-% 
-% [P_posterior_assigned_maybe,i_mouse_assigned_maybe]=max(P_posterior_chest,[],1);
-% p_chest_assigned_maybe=max(p_chest,[],1);
-% p_chest_assigned_thresh=1;  % 1/(m^2)
-% is_assigned= (P_posterior_assigned_maybe>0.95) & (p_chest_assigned_maybe>p_chest_assigned_thresh);
-% n_assigned=sum(is_assigned)  %#ok
-% frac_assigned=n_assigned/n_segments_localized  %#ok
-% is_assigned_correctly=is_assigned & (i_mouse_assigned_maybe==1);
-% n_assigned_correctly=sum(is_assigned_correctly)  %#ok
-% frac_assigned_correctly=n_assigned_correctly/n_assigned  %#ok
+% Using the faux mouse positions, determine fraction assigned
+[posterior_assigned_maybe,i_mouse_assigned_maybe]=max(posterior_chest_with_fake,[],1);
+pdf_chest_assigned_maybe=max(pdf_chest_with_fake,[],1);
+pdf_chest_assigned_thresh=1;  % 1/(m^2)
+is_assigned= (posterior_assigned_maybe>0.95) & (pdf_chest_assigned_maybe>pdf_chest_assigned_thresh);
+n_assigned=sum(is_assigned)  %#ok
+frac_assigned=n_assigned/n_segments_localized  %#ok
+is_assigned_correctly=is_assigned & (i_mouse_assigned_maybe==1);
+n_assigned_correctly=sum(is_assigned_correctly)  %#ok
+frac_assigned_correctly=n_assigned_correctly/n_assigned  %#ok
 

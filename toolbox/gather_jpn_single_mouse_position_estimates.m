@@ -5,7 +5,9 @@ function [date_str_flat, ...
           is_localized_flat, ...
           r_est_flat, ...
           r_head_from_video_flat, ...
-          r_tail_from_video_flat] = ...
+          r_tail_from_video_flat, ...
+          posterior_with_fake_flat, ...
+          pdf_with_fake_flat] = ...
   gather_jpn_single_mouse_position_estimates()
 
 % directories where to find stuff
@@ -37,6 +39,7 @@ letter_str{end+1}='E';
 
 n_trials=length(date_str);
 
+n_mice_with_fake=4;
 date_str_flat=cell(0,1);
 letter_str_flat=cell(0,1);
 i_trial_flat=zeros(0,1);
@@ -45,6 +48,8 @@ is_localized_flat=false(0,1);
 r_est_flat=zeros(2,0);
 r_head_from_video_flat=zeros(2,0);
 r_tail_from_video_flat=zeros(2,0);
+posterior_with_fake_flat=zeros(n_mice_with_fake,0);
+pdf_with_fake_flat=zeros(n_mice_with_fake,0);
 for i_trial = 1:n_trials ,
   date_str_this=date_str{i_trial};
   letter_str_this=letter_str{i_trial};
@@ -103,6 +108,8 @@ for i_trial = 1:n_trials ,
   r_est_this=flipud(r_est_this);
   r_chest_from_video_jpn_this=flipud(r_chest_from_video_jpn_this);  
   is_localized_this=~any(isnan(r_est_this),1)';
+  posterior_with_fake_this=s.p;
+  pdf_with_fake_this=s.density;
   
   % compare chest position according to the two sources
   % Note that Josh sets r_chest_from_video to nan for segments he can't
@@ -130,5 +137,7 @@ for i_trial = 1:n_trials ,
   r_est_flat=[r_est_flat r_est_this];  %#ok
   r_head_from_video_flat=[r_head_from_video_flat r_head_from_video_this];  %#ok
   r_tail_from_video_flat=[r_tail_from_video_flat r_tail_from_video_this];  %#ok
+  posterior_with_fake_flat=[posterior_with_fake_flat posterior_with_fake_this];  %#ok
+  pdf_with_fake_flat=[pdf_with_fake_flat pdf_with_fake_this];  %#ok
 end
 
