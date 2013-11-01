@@ -50,12 +50,12 @@ end
 clear r_est_blobs;
 
 % transform things from cell arrays what can
-n_snippets=length(tf_rect_name_all_snippets);  
-rsrp_grid_all_snippets=cell2mat(reshape(rsrp_grid_all_snippets,[1 1 n_snippets]));
+n_snippets=length(tf_rect_name_all_snippets);  %#ok
+rsrp_grid_all_snippets=cell2mat(reshape(rsrp_grid_all_snippets,[1 1 n_snippets]));  %#ok
 %rsrp_per_pair_grid_all_snippets=cell2mat(reshape(rsrp_per_pair_grid_all_snippets,[1 1 1 n_snippets]));
-r_est_all_snippets=cell2mat(reshape(r_est_all_snippets,[1 n_snippets]));
-r_head_from_video_all_snippets=cell2mat(reshape(r_head_from_video_all_snippets,[1 n_snippets]));
-r_tail_from_video_all_snippets=cell2mat(reshape(r_tail_from_video_all_snippets,[1 n_snippets]));
+r_est_all_snippets=cell2mat(reshape(r_est_all_snippets,[1 n_snippets]));  %#ok
+r_head_from_video_all_snippets=cell2mat(reshape(r_head_from_video_all_snippets,[1 n_snippets]));  %#ok
+r_tail_from_video_all_snippets=cell2mat(reshape(r_tail_from_video_all_snippets,[1 n_snippets]));  %#ok
 
 % unpack the trial overhead
 R=trial_overhead.R;
@@ -69,10 +69,10 @@ r_corners=trial_overhead.r_corners;
 clear trial_overhead;
 
 % get dims out
-N=size(v_all_snippets{1},1);  % all same length
+%N=size(v_all_snippets{1},1);  % all same length
 K=size(R,2);
 dt=1/fs;  % s
-n_snippets=length(tf_rect_name_all_snippets)
+n_snippets=length(tf_rect_name_all_snippets)  %#ok
 n_pairs=nchoosek(K,2);
 
 % figure setup
@@ -131,7 +131,7 @@ w_colorbar_spacer=0.05;  % in
 
 fig_h=figure('color','w');
 set_figure_size_explicit(fig_h,[w_fig h_fig]);
-axes_h=axes('parent',fig_h);  %#ok
+axes_h=axes('parent',fig_h);
 set(axes_h,'fontsize',7);
 set_axes_size_fixed_center_explicit(axes_h,[w_axes h_axes])
 
@@ -175,7 +175,7 @@ max_abs=max(max(max(abs(rsrp_per_pair_grid_normed))));
                                      clr_mike, ...
                                      clr_anno, ...
                                      r_est_pretty,[], ...
-                                     R,r_head_from_video_pretty,r_tail_from_video_pretty);  %#ok
+                                     R,r_head_from_video_pretty,r_tail_from_video_pretty);
 
 %close all;
 
@@ -193,9 +193,9 @@ max_abs=max(max(max(abs(rsrp_per_pair_grid_normed))));
 % need to do outlier filtering on r_est here
 [is_outlier,~,r_est_trans,Covariance_matrix] = kur_rce(r_est_all_snippets',1);
 is_outlier=logical(is_outlier);
-indices_of_outliers=find(is_outlier)
+indices_of_outliers=find(is_outlier)  %#ok
 r_est=r_est_trans';
-n_outliers=sum(is_outlier)
+n_outliers=sum(is_outlier)  %#ok
 
 % filter out the outliers
 is_keeper=~is_outlier;
@@ -209,8 +209,8 @@ rsrp_grid_pretty=mean(rsrp_grid_all_keepers,3);
 rsrp_abs_max=max(max(abs(rsrp_grid_pretty)));
 
 % Get the video position from the snippets
-i_start_all_snippets=cell2mat(i_start_all_snippets);
-i_end_all_snippets=cell2mat(i_end_all_snippets);
+i_start_all_snippets=cell2mat(i_start_all_snippets);  %#ok
+i_end_all_snippets=cell2mat(i_end_all_snippets);  %#ok
 [r_head_from_video,r_tail_from_video]= ...
   r_head_for_segment_from_snippets(r_head_from_video_all_snippets, ...
                                    r_tail_from_video_all_snippets, ...
@@ -243,9 +243,9 @@ r_tail_from_video_with_fake=[r_tail_from_video r_tail_from_video_fake];
 r_chest_from_video_real_and_fake= ...
   (3/4)*r_head_from_video_with_fake + ...
   (1/4)*r_tail_from_video_with_fake ;
-p_chest_real_and_fake=mvnpdf(r_chest_from_video_real_and_fake',r_est',Covariance_matrix)  % density
+p_chest_real_and_fake=mvnpdf(r_chest_from_video_real_and_fake',r_est',Covariance_matrix)    %#ok % density
 P_posterior_chest_from_video_real_and_fake= ...
-  p_chest_real_and_fake/sum(p_chest_real_and_fake)  % posterior probability
+  p_chest_real_and_fake/sum(p_chest_real_and_fake)    %#ok % posterior probability
 
 
 % plot the per-snippet estimates, the density, and the mice
