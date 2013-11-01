@@ -19,7 +19,7 @@ ax_output_dir_name_pattern = sprintf('*_%s_*',letter_str);
 ax_output_parent_dir_listing_struct = dir(fullfile(ax_output_parent_dir_name,ax_output_dir_name_pattern));
 ax_output_dir_name=ax_output_parent_dir_listing_struct.name;
 ax_output_mat_file_name = sprintf('Test_%s_1_voc_list_no_merge_har.mat',letter_str);
-ax_output_mat_file_name_abs=fullfile(ax_output_parent_dir_name,ax_output_dir_name,ax_output_mat_file_name);
+ax_output_mat_file_name_abs=fullfile(ax_output_parent_dir_name,ax_output_dir_name,ax_output_mat_file_name)
 
 % % read the video frame pulse data
 % yn_load_time_stamps = 'y';
@@ -265,3 +265,17 @@ for i_example_snippet=1:n_example_snippets
 end
 
 
+
+% try this
+f_plot_low=50e3;  % Hz
+f_plot_high=[];  % Hz
+A_plot_high=sqrt(1e-9)*40;  % V/Hz^0.5
+figure_handle=fig_spectrogram_ssl(exp_dir_name, ...
+                                  letter_str, ...
+                                  fs, ...
+                                  i_start, ...
+                                  i_end, ...
+                                  f_plot_low, ...
+                                  f_plot_high, ...
+                                  A_plot_high);
+                                
