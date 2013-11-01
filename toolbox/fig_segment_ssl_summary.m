@@ -6,6 +6,53 @@ function [fig_h,axes_h,axes_cb_h]= ...
                           colorbar_max, ...
                           are_mice_beyond_first_fake)
 
+% A function to make a figure showing the per-snippet position estimates 
+% for a single segment, along with the "likelihood" density.
+
+% r_est is a 2x1 vector giving the position estimate for the segment, in
+% meters.  A traditional Cartesian coordinate system is assumed.
+%
+% Covariance_matrix is a 2x2 matrix giving the covariance matrix associated
+% with the estimate.  Elements are in units of m^2.
+%
+% r_est_per_snippet is a 2 x n_snippets matrix, where n_snippets is the
+% number of snippets derived from the segment, giving the per-snippet
+% position estimates, in meters.
+%
+% is_outlier is a n_snippets x 1 logical vector indicating which snippets
+% were declared outliers.
+%
+% R is a 3 x n_mics matrix of microphone positions, where n_mics is the
+% number of microphones.  The microphone positions include the
+% z-coordinate, although it is not used.  In meters.
+%
+% r_corners is a 2x4 matrix giving the positions of the four corners of the
+% arena floor, in meters.
+% 
+% r_head is a 2 x n_mice matrix, where n_mice is the number of mice, giving
+% the head position of each of the mice.  In meters.
+%
+% r_tail is like r_head, but for the tails.
+%
+% colorbar_max gives the probability density (in 1/m^2) that is set to the
+% darkest color shown.  It is optional, and can be empty, in which case the
+% largest density in the floor area is used.
+%
+% are_mice_beyond_first_fake is a n_mice x 1 logical array indicating which
+% of the mice are real, and which are fake mice with randomly generated
+% positions.  Fake mice are shown in gray, real mice in color.  This is
+% optional, and can be empty, in which case all mice are assumed real.
+%
+%
+% On return:
+%
+% fig_h is the figure handle.
+%
+% axes_h is the main axes handle.
+%
+% axes_cb_h is the colorbar axes handle.
+
+
 % deal with args
 if ~exist('colorbar_max','var') ,
   colorbar_max=[];

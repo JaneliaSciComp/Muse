@@ -1,11 +1,11 @@
-function figure_handle=fig_spectrogram_ssl(exp_dir_name, ...
-                                           letter_str, ...
-                                           fs, ...
-                                           i_start, ...
-                                           i_end, ...
-                                           f_plot_low, ...
-                                           f_plot_high, ...
-                                           A_plot_high)
+function figure_handle=fig_spectrogram_ssl_power(exp_dir_name, ...
+                                                 letter_str, ...
+                                                 fs, ...
+                                                 i_start, ...
+                                                 i_end, ...
+                                                 f_plot_low, ...
+                                                 f_plot_high, ...
+                                                 S_plot_high)
 % fs in Hz
                                          
 % process args
@@ -15,8 +15,8 @@ end
 if ~exist('f_plot_high','var') ,
   f_plot_high=[];  % Hz
 end
-if ~exist('A_plot_high','var') ,
-  A_plot_high=[];  % V/Hz^{0.5}
+if ~exist('S_plot_high','var') ,
+  S_plot_high=[];  % V^2/Hz
 end
 
 % These are good spectrogram parameters
@@ -75,9 +75,9 @@ set(figure_handle,'color','w');
 
 % figure out the plot max
 S_max=max(max(max(S)))  %#ok
-A_max=sqrt(S_max);
-if isempty(A_plot_high) ,
-  A_plot_high=A_max;
+%A_max=sqrt(S_max);
+if isempty(S_plot_high) ,
+  S_plot_high=S_max;
 end
 
 % plot the spectrograms
@@ -87,8 +87,8 @@ for i_mic=1:n_mics ,
   axes(subplot_handle);  %#ok
   plot_powgram(1000*t_S,1e-3*f_S,1e9*S(:,:,i_mic),...
                [],1e-3*[f_plot_low f_plot_high],[],...
-               'amplitude', ...
-               [0 sqrt(1e9)*A_plot_high],...
+               'power', ...
+               [0 1e9*S_plot_high],...
                title_str);  % convert to mV^2/kHz
   set(subplot_handle,'fontsize',7);
   %ylim(ylim_tight(1000*v(:,i_mic)));
@@ -103,12 +103,11 @@ for i_mic=1:n_mics ,
     ylabel(subplot_handle,'Frequency (kHz)');
     colorbar_handle=add_colorbar(subplot_handle,0.1,0.075);
     set(colorbar_handle,'fontsize',7);
-    ylabel(colorbar_handle,'Amp density (mV/kHz^{0.5})');
-    set(colorbar_handle,'ytick',[0 sqrt(1e9)*A_plot_high]);
+    ylabel(colorbar_handle,'Power density (mV^2/kHz)');
+    set(colorbar_handle,'ytick',[0 1e9*S_plot_high]);
   end
 end
 colormap(subplot_handle,flipud(gray(256)));
-%colormap(subplot_handle,flipud(spindle_smooth(256)));
 xlabel(subplot_handle,'Time (ms)','fontsize',7);
 %ylim_all_same();
 %tl(1000*t(1),1000*t(end));

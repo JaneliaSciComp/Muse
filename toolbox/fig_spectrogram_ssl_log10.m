@@ -108,7 +108,6 @@ for i_mic=1:n_mics ,
   end
 end
 colormap(subplot_handle,flipud(gray(256)));
-%colormap(subplot_handle,flipud(spindle_smooth(256)));
 xlabel(subplot_handle,'Time (ms)','fontsize',7);
 %ylim_all_same();
 %tl(1000*t(1),1000*t(end));
