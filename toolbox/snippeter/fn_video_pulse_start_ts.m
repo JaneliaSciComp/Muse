@@ -1,4 +1,4 @@
-function [ video_pulse_start_ts, dist] = fn_video_pulse_start_ts(audio_data_dir_name, video_data_dir_name, audio_fname_prefix, video_fname_prefix, load_time_stamps, fc, vfc) 
+function video_pulse_start_ts = fn_video_pulse_start_ts(audio_data_dir_name, video_data_dir_name, audio_fname_prefix, video_fname_prefix, load_time_stamps, fc, vfc) 
 %fn_video_pulse_start_ts
 %   function extracts timestamps associated with recorded pulses from
 %   function generator that drive camera frames
@@ -47,8 +47,8 @@ if strcmp(load_time_stamps,'n')==1
     clear ts df_ts
     ts = strctMovInfo.m_afTimestamp;
     df_ts = diff(ts);
-    dist = figure;
-    hist(df_ts,0:0.001:(max(df_ts)+0.01))
+    %dist = figure;
+    %hist(df_ts,0:0.001:(max(df_ts)+0.01))
 %     xlim([(min(df_ts)-0.1) (max(df_ts)+0.1)])
     local_video_pulse_file_name = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
     absolute_video_pulse_file_name = fullfile(video_data_dir_name,local_video_pulse_file_name);    
@@ -56,14 +56,14 @@ if strcmp(load_time_stamps,'n')==1
 %     saveas(pul,sprintf('%s_video_pulses.jpg',video_fname_prefix));
     local_timestamp_distribution_file_name=sprintf('%s_timestamp_distribution.jpg',video_fname_prefix);
     absolute_timestamp_distribution_file_name = fullfile(video_data_dir_name,local_timestamp_distribution_file_name);        
-    saveas(dist,absolute_timestamp_distribution_file_name);
+    %saveas(dist,absolute_timestamp_distribution_file_name);
 else
     %cd (video_data_dir_name)
     %foo = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
     local_video_pulse_file_name = sprintf('%s_video_pulse_start_ts',video_fname_prefix);
     absolute_video_pulse_file_name = fullfile(video_data_dir_name,local_video_pulse_file_name);    
     load (absolute_video_pulse_file_name)
-    dist = figure('Visible','off');
+    %dist = figure('Visible','off');
 %     pul = figure('Visible','off');
 end
 
