@@ -7,7 +7,8 @@ function [figure_handle,subplot_handles]= ...
                          f_plot_low, ...
                          f_plot_high, ...
                          S_dB_plot_low, ...
-                         S_dB_plot_high)
+                         S_dB_plot_high, ...
+                         i_origin)
 
 % A function to plot a spectrogram of SSL data.
 %
@@ -44,6 +45,10 @@ function [figure_handle,subplot_handles]= ...
 % can be left empty, in which case the highest power density in the
 % spectrogram is used.
 %
+% i_origin is the sample index to be used as the time origin in the
+% spectrogram figure.  It is optional, and can be empty, in which case it
+% defaults to i_start.
+%
 %
 % On return:
 %
@@ -65,6 +70,9 @@ if ~exist('S_dB_plot_low','var') ,
 end
 if ~exist('S_dB_plot_high','var') ,
   S_dB_plot_high=[];  % "10*log10 V^2/Hz"
+end
+if ~exist('i_origin','var') || isempty(i_origin) ,
+  i_origin=i_start;
 end
 
 % These are good spectrogram parameters
@@ -101,7 +109,8 @@ for i_mic=1:n_mics
 end
 N_fft  %#ok
 W_smear_fw  %#ok
-t_S=t_S+t(1);  % powgram_mt only knows dt, so have to do this           
+%t_S=t_S+t(1);  % powgram_mt only knows dt, so have to do this
+t_S=t_S-dt*(i_origin-i_start);  % shift the time base, if requested
 %S_log=log(S);  % Spectrogram expects this
 %var_est=std(data_short_cent)^2;
 
