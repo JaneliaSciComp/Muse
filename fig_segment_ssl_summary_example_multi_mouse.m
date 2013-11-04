@@ -11,12 +11,14 @@ options.return_big_things=true;  % return the full map and other large
                                  % data structures
 
 % identifying info for the segment
-date_str='06132012';
-letter_str='D';
-i_segment=51;  % this was voc84 in the old-style
+date_str='10082012';
+letter_str='B';
+i_segment=8638;  
 
 % directories where to find stuff
-base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+%base_dir_name='~/egnor_stuff/ssl_vocal_structure_bizarro';
+% base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_vocal_structure';
+base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_vocal_structure';
 data_analysis_dir_name='Data_analysis10';
 
 % load the trial overhead
@@ -41,7 +43,7 @@ field_names=fieldnames(r_est_blobs);
 for i=1:length(field_names)
   eval(sprintf('%s_all_snippets={r_est_blobs(:).%s}'';',field_names{i},field_names{i}));
 end
-clear r_est_blobs;
+%clear r_est_blobs;
 
 % transform things from cell arrays what can
 n_snippets=length(tf_rect_name_all_snippets);  
@@ -81,46 +83,23 @@ i_end_all_snippets=cell2mat(i_end_all_snippets);  %#ok
                                    i_start_all_snippets, ...
                                    i_end_all_snippets);                                 
 
-% make up some mouse locations
-n_fake_mice=3;
-%[r_head_from_video_fake,r_tail_from_video_fake]= ...
-%  random_mouse_locations(R,r_head_from_video,r_tail_from_video,n_fake_mice);
-% These were a nice-looking sample:
-r_head_from_video_fake = ...
-   [     0.445553008346868         0.709662308265758         0.522328094818333 ; ...
-         0.334817684474456         0.419620179150835         0.582494615220904 ];
-r_tail_from_video_fake = ...
-   [     0.473832772083876         0.636316477631333         0.556192459384125 ; ...
-         0.257019105608912         0.381243714500405         0.658029830339911 ];
-
-% Have to transform these last to convential Cartesian coords
-r_head_from_video_fake(2,:)=(0.67925-r_head_from_video_fake(2,:))+0.0265;
-r_tail_from_video_fake(2,:)=(0.67925-r_tail_from_video_fake(2,:))+0.0265;
-
-       
-% caclulate the density at the real+fake mice, and the posterior
-% probability
-r_head_from_video_with_fake=[r_head_from_video r_head_from_video_fake];
-r_tail_from_video_with_fake=[r_tail_from_video r_tail_from_video_fake];
-% r_chest_from_video_real_and_fake= ...
-%   (3/4)*r_head_from_video_with_fake + ...
-%   (1/4)*r_tail_from_video_with_fake ;
-% p_chest_real_and_fake=mvnpdf(r_chest_from_video_real_and_fake',r_est',Covariance_matrix);  % density
-% P_posterior_chest_from_video_real_and_fake= ...
-%   p_chest_real_and_fake/sum(p_chest_real_and_fake);  % posterior probability
-
-
 % plot the per-snippet estimates, the density, and the mice
-colorbar_max=100;  % 1/m^2
-are_mice_beyond_first_fake=true;
+colorbar_max=[];  % 1/m^2
+are_mice_beyond_first_fake=false;
 [h_fig,h_axes,h_axes_cb]= ...
   fig_segment_ssl_summary(r_est,Covariance_matrix, ...
                           r_est_all_snippets,is_outlier, ...
                           R,r_corners, ...
-                          r_head_from_video_with_fake,r_tail_from_video_with_fake, ...
+                          r_head_from_video,r_tail_from_video, ...
                           colorbar_max, ...
                           are_mice_beyond_first_fake);
                         
+r_chest_from_video= ...
+  (3/4)*r_head_from_video + ...
+  (1/4)*r_tail_from_video ;
+p_chest=mvnpdf(r_chest_from_video',r_est',Covariance_matrix)  % density
+P_posterior= ...
+  p_chest/sum(p_chest)  % posterior probability
 
 
 

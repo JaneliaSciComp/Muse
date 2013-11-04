@@ -54,6 +54,7 @@ r_tail_from_video_keep=r_tail_from_video(:,keep,:);  %#ok
 % args_template_and_overhead=merge_scalar_structs(options,overhead);
 
 % do the estimation for each snippet
+n_mice=size(r_head_from_video,3);
 n_snippets=length(tf_rect_name_keep);
 r_est_blobs=struct([]);
 if isfield(options,'verbosity') ,
@@ -67,8 +68,8 @@ for i_snippet=1:n_snippets ,
   i_end_this=i_end_keep(i_snippet);  
   f_lo_this=f_lo_keep(i_snippet);  
   f_hi_this=f_hi_keep(i_snippet);  
-  r_head_from_video_this=r_head_from_video_keep(:,i_snippet);  
-  r_tail_from_video_this=r_tail_from_video_keep(:,i_snippet);
+  r_head_from_video_this=reshape(r_head_from_video_keep(:,i_snippet,:),[2 n_mice]);  
+  r_tail_from_video_this=reshape(r_tail_from_video_keep(:,i_snippet,:),[2 n_mice]);
 
   % estimate r
   r_est_blob_this = ... 

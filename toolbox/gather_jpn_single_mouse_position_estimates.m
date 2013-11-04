@@ -59,6 +59,11 @@ for i_trial = 1:n_trials ,
    ~,~,~,~,~,~,i_first_tf_rect_in_segment_this,i_last_tf_rect_in_segment_this]= ...
     ssl_trial_overhead_cartesian_heckbertian(base_dir_name,data_analysis_dir_name,date_str_this,letter_str_this);
 
+  % reshape r_head, r_tail to put snippets in third index
+  r_head_from_video_per_snippet=permute(r_head_from_video_per_snippet,[1 3 2]);
+  r_tail_from_video_per_snippet=permute(r_tail_from_video_per_snippet,[1 3 2]);
+  % should now be 2 x n_mice x n_snippets
+  
   % collect across snippets in a segment
   n_segments_this=length(i_first_tf_rect_in_segment_this);
   r_head_from_video_this=nan(2,n_segments_this);
@@ -69,9 +74,9 @@ for i_trial = 1:n_trials ,
     if ~isnan(i_first_snippet_this_segment) ,
       % if we get here, there are >=1 snippets in this segment
       r_head_from_video_per_snippet_this_segment= ...
-        r_head_from_video_per_snippet(:,i_first_snippet_this_segment:i_last_snippet_this_segment);
+        r_head_from_video_per_snippet(:,:,i_first_snippet_this_segment:i_last_snippet_this_segment);
       r_tail_from_video_per_snippet_this_segment= ...
-        r_tail_from_video_per_snippet(:,i_first_snippet_this_segment:i_last_snippet_this_segment);     
+        r_tail_from_video_per_snippet(:,:,i_first_snippet_this_segment:i_last_snippet_this_segment);     
       
       % Get the first and last audio sample index for each snippet
       i_first_sample_per_snippet_this_segment=i_start_per_snippet(i_first_snippet_this_segment:i_last_snippet_this_segment);
@@ -79,11 +84,13 @@ for i_trial = 1:n_trials ,
 
       % Summarize the positions across segments, taking care not to double
       % count snippets that correspond to the same time window
-      [r_head_from_video_this(:,i_segment),r_tail_from_video_this(:,i_segment)]= ...
+      [r_head_from_video_this_segment,r_tail_from_video_this_segment]= ...
         r_head_for_segment_from_snippets(r_head_from_video_per_snippet_this_segment, ...
                                          r_tail_from_video_per_snippet_this_segment, ...
                                          i_first_sample_per_snippet_this_segment, ...
                                          i_last_sample_per_snippet_this_segment);
+      r_head_from_video_this(:,i_segment)=r_head_from_video_this_segment;
+      r_tail_from_video_this(:,i_segment)=r_tail_from_video_this_segment;
     end
   end
   
@@ -135,8 +142,8 @@ for i_trial = 1:n_trials ,
                                (1:n_segments_this)'];  %#ok
   is_localized_flat=[is_localized_flat;is_localized_this];  %#ok
   r_est_flat=[r_est_flat r_est_this];  %#ok
-  r_head_from_video_flat=[r_head_from_video_flat r_head_from_video_this];  %#ok
-  r_tail_from_video_flat=[r_tail_from_video_flat r_tail_from_video_this];  %#ok
+  r_head_from_video_flat=cat(2,r_head_from_video_flat,r_head_from_video_this);  %#ok
+  r_tail_from_video_flat=cat(2,r_tail_from_video_flat,r_tail_from_video_this);  %#ok
   posterior_with_fake_flat=[posterior_with_fake_flat posterior_with_fake_this];  %#ok
   pdf_with_fake_flat=[pdf_with_fake_flat pdf_with_fake_this];  %#ok
 end
