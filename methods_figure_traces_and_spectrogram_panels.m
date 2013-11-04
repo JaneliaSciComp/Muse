@@ -120,6 +120,7 @@ for i_mic=1:n_mics
        'ydata',yl, ...
        'color','k');
 end
+set(figure_handle,'name','traces');
 
 % % write to a .tcs file
 % name=cell(n_mics,1);
@@ -367,5 +368,7 @@ for i_example_snippet=1:n_example_snippets
          'color',clr);
   end
 end
+
+set(figure_handle,'name','spectrograms');
 
                                       

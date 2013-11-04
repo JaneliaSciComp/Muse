@@ -122,5 +122,6 @@ z_mics_and_floor=0;
 do_draw_mask=false;
 draw_mics_and_floor_in_axes(axes_h,r_mics,r_corners,z_mics_and_floor,do_draw_mask);
 
+set(fig_h,'name','video_frame');
    
    

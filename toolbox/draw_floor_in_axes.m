@@ -1,8 +1,11 @@
-function draw_mics_and_floor_in_axes(axes_h,r_mics,r_corners,z,do_draw_mask)
+function draw_floor_in_axes(axes_h,r_corners,z,do_draw_mask,do_draw_scale_bar)
 
 % deal with args
 if ~exist('do_draw_mask','var') || isempty(do_draw_mask) ,
   do_draw_mask=true;
+end
+if ~exist('do_draw_scale_bar','var') || isempty(do_draw_mask) ,
+  do_draw_mask=false;
 end
 
 % Sort the corners properly
@@ -11,9 +14,9 @@ r_corners(:,3:4)=fliplr(r_corners(:,3:4));
   % now they're in clockwise order, starting with the one near the origin
 
 % Determine axis limits
-padding=0.045;  % m, amount of space to add around microphones
-xl=[min(r_mics(1,:))-padding max(r_mics(1,:))+padding];
-yl=[min(r_mics(2,:))-padding max(r_mics(2,:))+padding];
+padding=0.005;  % m, amount of space to add around corners
+xl=[min(r_corners(1,:))-padding max(r_corners(1,:))+padding];
+yl=[min(r_corners(2,:))-padding max(r_corners(2,:))+padding];
 
 % set up the main axes
 %set_axes_size_fixed_center_explicit(axes_h,[w_axes h_axes])
@@ -55,25 +58,6 @@ if do_draw_mask,
         'edgecolor','none');
 end
 
-% Draw the microphone symbols and labels
-n_mics=size(r_mics,2);
-mic_circle_radius=0.02;  % m
-for i_mic=1:n_mics
-  switch i_mic ,
-    case 1,
-      v=[0;1];
-    case 2,
-      v=[1;0];
-    case 3,
-      v=[0;-1];
-    case 4,
-      v=[-1;0];
-  end
-  mic_symbol(axes_h,100*r_mics(1:2,i_mic),v,100*mic_circle_radius, ...
-             sprintf('%d',i_mic), ...
-             100*z+0.1);
-end
-
 % draw the outline of the floor
 line('parent',axes_h, ...
      'xdata',100*[r_corners(1,:) r_corners(1,1)], ...
@@ -82,13 +66,15 @@ line('parent',axes_h, ...
      'color','k');
    
 % draw the scale bar
-x=0.4*r_mics(1,1)+0.6*r_mics(1,4);
-y=r_mics(2,1)-mic_circle_radius;
-line('parent',axes_h, ...
-     'xdata',100*x+[-5 5], ...
-     'ydata',100*y*[1 1], ...
-     'zdata',100*z*[1 1]+0.1, ...
-     'color','k', ...
-     'linewidth',2);
-   
+if do_draw_scale_bar ,
+  x=0.2*xl(1)+0.8*xl(2);
+  y=0.9*yl(1)+0.1*yl(2);
+  line('parent',axes_h, ...
+       'xdata',100*x+[-5 5], ...
+       'ydata',100*y*[1 1], ...
+       'zdata',100*z*[1 1]+0.1, ...
+       'color','k', ...
+       'linewidth',2);
+end
+
 end
