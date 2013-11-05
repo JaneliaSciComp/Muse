@@ -217,7 +217,7 @@ max_abs=max(max(max(abs(rsrp_per_pair_grid_normed))));
                                          r_corners, ...
                                          r_head_from_video_pretty, ...
                                          r_tail_from_video_pretty);
-set(fig_h,'name','per_mic_maps');                
+set(fig_h,'name','per_mic_pair_maps');                
 
 %close all;
 
