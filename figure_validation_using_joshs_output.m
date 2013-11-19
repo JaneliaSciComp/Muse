@@ -66,6 +66,7 @@ dist_centers=(dist_edges(1:end-1)+dist_edges(2:end))/2;
 e_mag_mean=mean(e_mag)  %#ok
 e_mag_rms=rms(e_mag)  %#ok
 e_mag_median=median(e_mag)  %#ok
+frac_less_than_10_cm=mean(e_mag<0.10)
 
 % % plot that histogram
 % figure('color','w');
