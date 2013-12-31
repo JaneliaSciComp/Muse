@@ -153,8 +153,9 @@ image('parent',axes_h, ...
 
 % draw the mask, which covers the part of the density that extends beyond
 % the floor outline
-r_corners=sortrows(r_corners')';  % make sure sorted by x, then y
-r_corners(:,3:4)=fliplr(r_corners(:,3:4));  
+%r_corners=sortrows(r_corners')';  % make sure sorted by x, then y
+%r_corners(:,3:4)=fliplr(r_corners(:,3:4));  
+r_corners=sort_corners(r_corners);
   % now they're in clockwise order, starting with the one near the origin
 r_mask_part_1= ...
   [xl(1) xl(2) xl(2) xl(1) xl(1) ; ...

@@ -10,7 +10,11 @@ addpath(genpath(fullfile(this_dir_name,'toolbox','parsejpg8')));
 %addpath(genpath(fullfile(this_dir_name,'groundswell/groundswell_rel_118')));
 parent_dir_name=fileparts(this_dir_name);
 addpath(degit(genpath(fullfile(parent_dir_name,'ax_repo'))));
-addpath(degit(genpath('~/groundswell/repo')));
+if (ispc())
+  addpath(degit(genpath('Z:/groundswell/repo')));
+else  
+  addpath(degit(genpath('~/groundswell/repo')));
+end
 
 end
 

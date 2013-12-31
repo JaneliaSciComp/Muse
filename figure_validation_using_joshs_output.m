@@ -66,7 +66,17 @@ dist_centers=(dist_edges(1:end-1)+dist_edges(2:end))/2;
 e_mag_mean=mean(e_mag)  %#ok
 e_mag_rms=rms(e_mag)  %#ok
 e_mag_median=median(e_mag)  %#ok
+frac_less_than_1_cm=mean(e_mag<0.01)
+frac_less_than_2_cm=mean(e_mag<0.02)
+frac_less_than_3_cm=mean(e_mag<0.03)
+frac_less_than_4_cm=mean(e_mag<0.04)
+frac_less_than_5_cm=mean(e_mag<0.05)
+frac_less_than_6_cm=mean(e_mag<0.06)
+frac_less_than_7_cm=mean(e_mag<0.07)
+frac_less_than_8_cm=mean(e_mag<0.08)
+frac_less_than_9_cm=mean(e_mag<0.09)
 frac_less_than_10_cm=mean(e_mag<0.10)
+save('e_mag.mat','e_mag');  % save the numbers for Josh
 
 % % plot that histogram
 % figure('color','w');

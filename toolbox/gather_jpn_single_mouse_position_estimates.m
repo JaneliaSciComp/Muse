@@ -11,7 +11,11 @@ function [date_str_flat, ...
   gather_jpn_single_mouse_position_estimates()
 
 % directories where to find stuff
-base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+if ispc()
+  base_dir_name='Y:/Neunuebel/ssl_sys_test';  
+else
+  base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+end
 data_analysis_dir_name='Data_analysis10';
 
 % identifying info for each trial

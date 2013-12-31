@@ -6,8 +6,7 @@ if ~exist('do_draw_mask','var') || isempty(do_draw_mask) ,
 end
 
 % Sort the corners properly
-r_corners=sortrows(r_corners')';  % make sure sorted by x, then y
-r_corners(:,3:4)=fliplr(r_corners(:,3:4));  
+r_corners=sort_corners(r_corners);
   % now they're in clockwise order, starting with the one near the origin
 
 % Determine axis limits
