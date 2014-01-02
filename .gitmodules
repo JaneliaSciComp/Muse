@@ -1,0 +1,6 @@
+[submodule "motr"]
+	path = motr
+	url = https://github.com/motr/motr.git
+[submodule "tmt"]
+	path = tmt
+	url = https://github.com/adamltaylor/tmt.git
