@@ -50,7 +50,7 @@ exp_dir_name=fullfile(base_dir_name, ...
 i_frame_example=24417;
 video_file_name=fullfile(exp_dir_name, ...
                          sprintf('Test_%s_1.seq',letter_str));
-video_info=fnReadSeqInfo_jpn(video_file_name);
+video_info=fnReadSeqInfo(video_file_name);
 example_frame=fnReadFrameFromSeq(video_info,i_frame_example);
 [frame_height_in_pels,frame_width_in_pels]=size(example_frame);
 %r_frame_upper_left_pel_center_pels=[1/2 size(example_frame,1)-1/2]';  

@@ -1,4 +1,8 @@
-exp_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
+if ispc()
+  exp_dir_name='//dm11/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
+else
+  exp_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
+end
 letter_str='D';
 data_analysis_dir_name='Data_analysis10';
 %session_base_name=sprintf('Test_%s_1',letter_str);

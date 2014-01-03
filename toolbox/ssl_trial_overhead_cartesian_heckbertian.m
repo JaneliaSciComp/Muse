@@ -93,7 +93,7 @@ else
   % Cartesian
   video_file_name=fullfile(exp_dir_name, ...
                            sprintf('Test_%s_1.seq',letter_str));
-  video_info=fnReadSeqInfo_jpn(video_file_name);
+  video_info=fnReadSeqInfo(video_file_name);
   frame_height_in_pels=video_info.m_iHeight;
   y_offset=meters_per_pel*(frame_height_in_pels+1);
   R(2,:)=y_offset-R(2,:);

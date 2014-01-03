@@ -1,7 +1,11 @@
 % identifying info for the segment, snippet
 date_str='06132012';
 letter_str='D';
-base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+if ispc()
+  base_dir_name='//dm11/egnorlab/Neunuebel/ssl_sys_test';
+else
+  base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+end
 data_analysis_dir_name='Data_analysis10';
 fs=450450;  % Hz, happen to know this a priori
 fs_video=29;  % Hz
@@ -50,7 +54,7 @@ mouse_example_segment=mouse_from_ax(is_example_segment);
 i_frame_example=mouse_example_segment.frame_number;
 video_file_name=fullfile(exp_dir_name, ...
                          sprintf('Test_%s_1.seq',letter_str));
-video_info=fnReadSeqInfo_jpn(video_file_name);
+video_info=fnReadSeqInfo(video_file_name);
 example_frame=fnReadFrameFromSeq(video_info,i_frame_example);
 [frame_height_in_pels,frame_width_in_pels]=size(example_frame);
 %r_frame_upper_left_pel_center_pels=[1/2 size(example_frame,1)-1/2]';  

@@ -43,7 +43,7 @@ if strcmp(load_time_stamps,'n')==1
     %cd (video_data_dir_name)
     local_video_file_name = sprintf('%s.seq',video_fname_prefix);
     absolute_video_file_name = fullfile(video_data_dir_name,local_video_file_name);
-    strctMovInfo = fnReadSeqInfo_jpn(absolute_video_file_name);
+    strctMovInfo = fnReadSeqInfo(absolute_video_file_name);
     clear ts df_ts
     ts = strctMovInfo.m_afTimestamp;
     df_ts = diff(ts);

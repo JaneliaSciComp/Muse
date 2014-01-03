@@ -18,7 +18,11 @@ i_segment=8638;
 % directories where to find stuff
 %base_dir_name='~/egnor_stuff/ssl_vocal_structure_bizarro';
 % base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_vocal_structure';
-base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_vocal_structure';
+if ispc()
+  base_dir_name='//dm11/egnorlab/Neunuebel/ssl_vocal_structure';
+else
+  base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_vocal_structure';
+end
 data_analysis_dir_name='Data_analysis10';
 
 % load the trial overhead

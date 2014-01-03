@@ -16,7 +16,11 @@ letter_str='D';
 i_segment=51;  % this was voc84 in the old-style
 
 % directories where to find stuff
-base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+if ispc()
+  base_dir_name='//dm11/egnorlab/Neunuebel/ssl_sys_test';
+else
+  base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+end
 data_analysis_dir_name='Data_analysis10';
 
 % load the trial overhead
