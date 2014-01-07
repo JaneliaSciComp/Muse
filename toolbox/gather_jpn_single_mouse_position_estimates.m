@@ -12,7 +12,7 @@ function [date_str_flat, ...
 
 % directories where to find stuff
 if ispc()
-  base_dir_name='Y:/Neunuebel/ssl_sys_test';  
+  base_dir_name='Z:/Neunuebel/ssl_sys_test';  
 else
   base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
 end
