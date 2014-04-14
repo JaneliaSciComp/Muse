@@ -1,0 +1,16 @@
+# Here's the deal: Life is too short to deal with git and its
+# byzantine options for line endings.  So we do no translation.
+# If you're on Windows, you need to use tools that can deal with Unix-style
+# line endings, and you need to make sure you don't commit new files that
+# have Windows-style line endings.
+
+# Set default behaviour
+# Note that this _overrides_ any user setting for core.autocrlf (I think).
+#
+# If you encounter problems, do:
+#     git config --global core.autocrlf false
+# This turns off all line ending conversions on commit AND checkout.
+#
+# The setting below turns off all line ending conversions for all 
+# files in this project.  
+* binary
