@@ -11,6 +11,16 @@
 #     git config --global core.autocrlf false
 # This turns off all line ending conversions on commit AND checkout.
 #
-# The setting below turns off all line ending conversions for all 
-# files in this project.  
-* binary
+# But you also don't want to declare everything binary, b/c then Sourcetree 
+# doesn't show you the diffs properly.
+
+*.m text eol=lf
+*.mat binary
+*.c text eol=lf
+*.h text eol=lf
+*.cpp text eol=lf
+*.hpp text eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary
+
