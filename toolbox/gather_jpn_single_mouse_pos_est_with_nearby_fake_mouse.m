@@ -2,12 +2,13 @@ function [date_str_flat, ...
           letter_str_flat, ...
           i_trial_flat, ...
           i_segment_within_trial_flat, ...
-          is_localized_flat, ...
-          r_est_flat, ...
+          is_localized_jpn_flat, ...
+          r_est_jpn_flat, ...
           r_head_from_video_flat, ...
           r_tail_from_video_flat, ...
-          posterior_with_fake_flat, ...
-          pdf_with_fake_flat] = ...
+          posterior_jpn_with_fake_flat, ...
+          pdf_jpn_with_fake_flat, ...
+          r_chest_from_video_jpn_with_fake_flat] = ...
   gather_jpn_single_mouse_pos_est_with_nearby_fake_mouse()
 
 % directories where to find stuff
@@ -48,12 +49,13 @@ date_str_flat=cell(0,1);
 letter_str_flat=cell(0,1);
 i_trial_flat=zeros(0,1);
 i_segment_within_trial_flat=zeros(0,1);
-is_localized_flat=false(0,1);
-r_est_flat=zeros(2,0);
+is_localized_jpn_flat=false(0,1);
+r_est_jpn_flat=zeros(2,0);
 r_head_from_video_flat=zeros(2,0);
 r_tail_from_video_flat=zeros(2,0);
-posterior_with_fake_flat=zeros(n_mice_with_fake,0);
-pdf_with_fake_flat=zeros(n_mice_with_fake,0);
+posterior_jpn_with_fake_flat=zeros(n_mice_with_fake,0);
+pdf_jpn_with_fake_flat=zeros(n_mice_with_fake,0);
+r_chest_from_video_jpn_with_fake_flat=zeros(2,n_mice_with_fake,0);
 for i_trial = 1:n_trials ,
   date_str_this=date_str{i_trial};
   letter_str_this=letter_str{i_trial};
@@ -113,14 +115,16 @@ for i_trial = 1:n_trials ,
   n_segments_this=length(i_first_tf_rect_in_segment_this);
   
   % unpack Josh's data
-  r_est_this=s.centroid_chunks;
+  r_est_jpn_this=s.centroid_chunks;
   r_chest_from_video_jpn_this=reshape(s.coords_mouse2(:,1,:),[2 n_segments_this]);
+  r_chest_from_video_jpn_with_fake_this=s.coords_mouse2;  
   % for single-mouse data, Josh has x and y coords swapped
-  r_est_this=flipud(r_est_this);
+  r_est_jpn_this=flipud(r_est_jpn_this);
   r_chest_from_video_jpn_this=flipud(r_chest_from_video_jpn_this);  
-  is_localized_this=~any(isnan(r_est_this),1)';
-  posterior_with_fake_this=s.p;
-  pdf_with_fake_this=s.density;
+  r_chest_from_video_jpn_with_fake_this=flip(r_chest_from_video_jpn_with_fake_this,1);    
+  is_localized_jpn_this=~any(isnan(r_est_jpn_this),1)';
+  posterior_jpn_with_fake_this=s.p;
+  pdf_jpn_with_fake_this=s.density;
   
   % compare chest position according to the two sources
   % Note that Josh sets r_chest_from_video to nan for segments he can't
@@ -128,7 +132,7 @@ for i_trial = 1:n_trials ,
   r_chest_from_video_this=(3/4)*r_head_from_video_this+(1/4)*r_tail_from_video_this;
   e_chest_from_video_this=r_chest_from_video_this-r_chest_from_video_jpn_this;
   e_mag_chest_from_video_this=normcols(e_chest_from_video_this);
-  e_mag_chest_from_video_this_localized=e_mag_chest_from_video_this(is_localized_this);
+  e_mag_chest_from_video_this_localized=e_mag_chest_from_video_this(is_localized_jpn_this);
   e_mag_diff_mean=mean(e_mag_chest_from_video_this_localized);  %#ok
   e_mag_diff_median=median(e_mag_chest_from_video_this_localized);  %#ok
   e_mag_diff_max=max(e_mag_chest_from_video_this_localized);  %#ok
@@ -144,11 +148,12 @@ for i_trial = 1:n_trials ,
   i_trial_flat=[i_trial_flat;repmat(i_trial,[n_segments_this 1])];  %#ok
   i_segment_within_trial_flat=[i_segment_within_trial_flat ; ...
                                (1:n_segments_this)'];  %#ok
-  is_localized_flat=[is_localized_flat;is_localized_this];  %#ok
-  r_est_flat=[r_est_flat r_est_this];  %#ok
+  is_localized_jpn_flat=[is_localized_jpn_flat;is_localized_jpn_this];  %#ok
+  r_est_jpn_flat=[r_est_jpn_flat r_est_jpn_this];  %#ok
   r_head_from_video_flat=cat(2,r_head_from_video_flat,r_head_from_video_this);
   r_tail_from_video_flat=cat(2,r_tail_from_video_flat,r_tail_from_video_this);
-  posterior_with_fake_flat=[posterior_with_fake_flat posterior_with_fake_this];  %#ok
-  pdf_with_fake_flat=[pdf_with_fake_flat pdf_with_fake_this];  %#ok
+  posterior_jpn_with_fake_flat=[posterior_jpn_with_fake_flat posterior_jpn_with_fake_this];  %#ok
+  pdf_jpn_with_fake_flat=[pdf_jpn_with_fake_flat pdf_jpn_with_fake_this];  %#ok
+  r_chest_from_video_jpn_with_fake_flat=cat(3,r_chest_from_video_jpn_with_fake_flat,r_chest_from_video_jpn_with_fake_this);  
 end
 
