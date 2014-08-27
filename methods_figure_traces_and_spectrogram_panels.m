@@ -1,5 +1,5 @@
 if ispc()
-  exp_dir_name='//dm11/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
+  exp_dir_name='z:/Neunuebel/ssl_sys_test/sys_test_06132012';
 else
   exp_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test/sys_test_06132012';
 end
