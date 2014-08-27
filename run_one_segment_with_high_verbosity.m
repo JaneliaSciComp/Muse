@@ -11,7 +11,11 @@ options.return_big_things=true;  % return the full map and other large
 % directories where to find stuff
 %base_dir_name='~/egnor_stuff/ssl_vocal_structure_bizarro';
 % base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_vocal_structure';
-base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+if ispc() ,
+    base_dir_name='z:/Neunuebel/ssl_sys_test';
+else
+    base_dir_name='/groups/egnor/egnorlab/Neunuebel/ssl_sys_test';
+end
 data_analysis_dir_name='Data_analysis10';
 
 % identifying info for the segment
