@@ -1,10 +1,16 @@
-This is Muse, which stands for Mouse Ultrasonic Source Estimator.  
-Anyway, it does sound-source localization of ultrasonic mouse 
-vocalizations.
+This is Muse, which stands for Mouse Ultrasonic Source Estimator.  It
+does sound-source localization of ultrasonic mouse vocalizations.
 
 This version of Muse depends on the Matlab Signal Processing and
 Statistics toolboxes, and on the Taylor Matlab Toolbox, release
 1.14.
+
+A MATLAB-based data acquisition function that uses a National
+Instruments board (rec_pb_3_jpn.m) is included in the repository, but
+vocalizations can also be recorded using your favorite data
+acquisition software.  To prepare vocalizations for localization, they
+should almost certainly should be cut out using Ax
+(https://github.com/JaneliaSciComp/Ax).
 
 All code in Muse, except that in toolbox/snippeter, is copyright Adam
 L. Taylor, 2013-2015.  It is licensed under the BSD 2-clause license.
