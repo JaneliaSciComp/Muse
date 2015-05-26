@@ -1,6 +1,14 @@
 This is Muse, which stands for Mouse Ultrasonic Source Estimator.  It
 does sound-source localization of ultrasonic mouse vocalizations.
 
+The core function of Muse is r_est_from_clip_simplified(), located in
+toolbox/r_est_from_clip_simplified.m.  See the documentation within
+that file for how to invoke it and how to interpret its output.  This
+was the function used to estimate position from individual "snippets"
+in Neunuebel et al. 2015.  You can run the script
+test_with_synthetic_data.m to see an example of how to call
+r_est_from_clip_simplified() on, you guessed it, synthetic data.
+
 This version of Muse depends on the Matlab Signal Processing and
 Statistics toolboxes, and on the Taylor Matlab Toolbox, release
 1.14.
